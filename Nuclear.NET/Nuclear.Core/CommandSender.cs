@@ -4,12 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Nuclear
 {
-    public interface EventPublisher
+    public interface CommandSender
     {
-        void Publish<TEvent>(TEvent @event) where TEvent : Event;
+        void Send<T>(T command) where T : Command;
     }
 }

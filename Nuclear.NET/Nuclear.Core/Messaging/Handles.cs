@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Nuclear.Domain
+namespace Nuclear.Messaging
 {
-    public interface Command
+    public interface Handles<T> where T : Message
     {
+        void Handle(T message);
     }
 }
