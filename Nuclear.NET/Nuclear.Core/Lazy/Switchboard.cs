@@ -4,18 +4,31 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace Nuclear
+namespace Nuclear.Lazy
 {
     public class Switchboard : Bus
     {
         private readonly Dictionary<Type, List<Action<Message>>> _routes
             = new Dictionary<Type, List<Action<Message>>>();
 
+
+        public Action<object, Command> CommandSent
+        {
+            get;
+            set;
+        }
+
+        public Action<object, Event> EventPublished
+        {
+            get;
+            set;
+        }
+
         public void RegisterHandler<T>(Action<T> handler) where T : Command
         {
-            // Comment for real
             List<Action<Message>> handlers;
 
             if (!_routes.TryGetValue(typeof(T), out handlers))
@@ -55,6 +68,9 @@ namespace Nuclear
             {
                 throw new InvalidOperationException("no handler registered");
             }
+
+            if (CommandSent != null)
+                CommandSent(this, command);
         }
 
         public void Publish<T>(T @event) where T : Event
@@ -71,9 +87,12 @@ namespace Nuclear
             {
                 //dispatch on thread pool for added awesomeness
                 var handler1 = handler;
-                // ThreadPool.QueueUserWorkItem(x => handler1(@event));
-                handler1(@event);
+                ThreadPool.QueueUserWorkItem(x => handler1(@event));
+                // handler1(@event);
             }
+
+            if (EventPublished != null)
+                EventPublished(this, @event);
         }
 
     }
