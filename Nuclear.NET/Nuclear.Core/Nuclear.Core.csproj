@@ -42,14 +42,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommandSender.cs" />
+    <Compile Include="Messaging\Bus.cs" />
+    <Compile Include="Messaging\CommandDelegate.cs" />
     <Compile Include="Domain\Aggregate.cs" />
     <Compile Include="Domain\AggregateBase.cs" />
     <Compile Include="Messaging\Command.cs" />
     <Compile Include="Messaging\Event.cs" />
     <Compile Include="Messaging\Handles.cs" />
     <Compile Include="Messaging\Message.cs" />
-    <Compile Include="EventPublisher.cs" />
+    <Compile Include="Messaging\EventDispatcher.cs" />
     <Compile Include="Extensions\PrivateReflectionDynamicObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Switchboard.cs" />

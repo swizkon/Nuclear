@@ -11,7 +11,6 @@ namespace Nuclear.Domain
 {
     public abstract class AggregateRoot : Aggregate
     {
-
         private readonly List<Event> _changes = new List<Event>();
 
         // public abstract Guid Id { get; }

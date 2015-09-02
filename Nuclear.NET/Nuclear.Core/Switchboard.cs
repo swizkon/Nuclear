@@ -8,14 +8,27 @@ using System.Threading.Tasks;
 
 namespace Nuclear
 {
-    public class Switchboard : 
-        EventPublisher, 
-        CommandSender
+    public class Switchboard : Bus
     {
         private readonly Dictionary<Type, List<Action<Message>>> _routes
             = new Dictionary<Type, List<Action<Message>>>();
 
-        public void RegisterHandler<T>(Action<T> handler) where T : Message
+        public void RegisterHandler<T>(Action<T> handler) where T : Command
+        {
+            // Comment for real
+            List<Action<Message>> handlers;
+
+            if (!_routes.TryGetValue(typeof(T), out handlers))
+            {
+                handlers = new List<Action<Message>>();
+                _routes.Add(typeof(T), handlers);
+            }
+
+            handlers.Add((x => handler((T)x)));
+        }
+
+
+        public void RegisterSubscriber<T>(Action<T> handler) where T : Event
         {
             List<Action<Message>> handlers;
 
