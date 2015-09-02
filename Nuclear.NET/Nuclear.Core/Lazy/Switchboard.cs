@@ -70,7 +70,9 @@ namespace Nuclear.Lazy
             }
 
             if (CommandSent != null)
+            {
                 CommandSent(this, command);
+            }
         }
 
         public void Publish<T>(T @event) where T : Event
