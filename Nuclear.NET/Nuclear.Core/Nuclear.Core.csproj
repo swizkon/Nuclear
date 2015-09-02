@@ -42,6 +42,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Domain\AggregateRepository.cs" />
+    <Compile Include="Domain\IAggregateEventStore.cs" />
+    <Compile Include="EventSourcing\EventSourcedAggregateRepository.cs" />
     <Compile Include="Messaging\Bus.cs" />
     <Compile Include="Messaging\CommandDelegate.cs" />
     <Compile Include="Domain\Aggregate.cs" />

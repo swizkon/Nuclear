@@ -9,7 +9,7 @@ using Nuclear.Messaging;
 
 namespace Nuclear.Domain
 {
-    public abstract class AggregateRoot : Aggregate
+    public abstract class AggregateBase : Aggregate
     {
         private readonly List<Event> _changes = new List<Event>();
 
@@ -23,7 +23,7 @@ namespace Nuclear.Domain
         protected Guid Id; // { get; }
         public int Version { get; internal set; }
 
-        protected AggregateRoot(Guid id)
+        protected AggregateBase(Guid id)
         {
             // this.Version += 1;
             Console.WriteLine("Contructing " + this.GetType().Name + " with Id: " + id.ToString());
