@@ -42,7 +42,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Diagnostics\BusTracer.cs" />
     <Compile Include="Domain\AggregateRepository.cs" />
     <Compile Include="Domain\IAggregateEventStore.cs" />
     <Compile Include="EventSourcing\EventSourcedAggregateRepository.cs" />
