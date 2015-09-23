@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="Domain\AggregateRepository.cs" />
     <Compile Include="Domain\IAggregateEventStore.cs" />
+    <Compile Include="Domain\StreamAggregate.cs" />
     <Compile Include="EventSourcing\EventSourcedAggregateRepository.cs" />
     <Compile Include="EventSourcing\EventStreamStore.cs" />
     <Compile Include="Lazy\InMemEventStore.cs" />

@@ -162,12 +162,14 @@ namespace Nuclear.EventStore
         }
         */
 
+        /*
         private static TAggregate ConstructAggregate<TAggregate>(Guid id)
         {
             return (TAggregate)Activator.CreateInstance(typeof(TAggregate), id);
 
             // return (TAggregate)Activator.CreateInstance(typeof(TAggregate), true);
         }
+        */
 
         private static IEnumerable<EventData> PrepareEvents(IEnumerable<object> events, IDictionary<string, object> commitHeaders)
         {
@@ -223,22 +225,9 @@ namespace Nuclear.EventStore
 
                 foreach (var evnt in currentSlice.Events)
                 {
-                    Event eventForAggr = (Event)DeserializeEvent(evnt.OriginalEvent.Metadata, evnt.OriginalEvent.Data);
-                    Console.WriteLine(eventForAggr);
-                    eventsForAggregate.Add(eventForAggr);
-                    /*
-                    var apply = aggregate.GetType()
-                                .GetMethod("ApplyChange", BindingFlags.NonPublic | BindingFlags.Instance);
-
-                    apply.Invoke(aggregate,
-                        new object[] { DeserializeEvent(evnt.OriginalEvent.Metadata, evnt.OriginalEvent.Data) }
-                        );
-
-                    var applyChange = aggregate.GetType().GetMethod("ApplyChange", System.Reflection.BindingFlags.NonPublic);
-                    applyChange.Invoke(aggregate,
-                        new object[] { DeserializeEvent(evnt.OriginalEvent.Metadata, evnt.OriginalEvent.Data) }
-                        );
-                    */
+                    Event aggrEvent = (Event)DeserializeEvent(evnt.OriginalEvent.Metadata, evnt.OriginalEvent.Data);
+                    // Console.WriteLine(aggrEvent);
+                    eventsForAggregate.Add(aggrEvent);
                 }
 
             } while (!currentSlice.IsEndOfStream);
@@ -246,7 +235,7 @@ namespace Nuclear.EventStore
             return eventsForAggregate;
         }
 
-        public void SaveEvents(Aggregate aggregate, Guid aggregateId, IEnumerable<Event> events)
+        public void SaveEvents(Aggregate aggregate, Guid aggregateId, IEnumerable<Event> uncommittedEvents)
         {
             // throw new NotImplementedException();
 
@@ -290,8 +279,10 @@ namespace Nuclear.EventStore
                 transaction.CommitAsync().Wait();
             }
 
-            foreach (var @event in events)
+            foreach (var @event in aggregate.GetUncommittedChanges())
+            {
                 _publisher.Publish(@event);
+            }
 
             aggregate.ClearUncommittedEvents();
 

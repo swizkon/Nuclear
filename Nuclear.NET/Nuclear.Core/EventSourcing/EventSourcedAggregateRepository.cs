@@ -27,8 +27,7 @@ namespace Nuclear.EventSourcing
         {
             // var obj = new T(); // lots of ways to do this
 
-            TAggregate obj = (TAggregate)Activator.CreateInstance(typeof(TAggregate), id);// as T;
-
+            TAggregate obj = (TAggregate)Activator.CreateInstance(typeof(TAggregate), id);
             // Activator.CreateInstance(typeof(T), id);
 
             var e = _storage.GetEventsForAggregate(obj, id);
