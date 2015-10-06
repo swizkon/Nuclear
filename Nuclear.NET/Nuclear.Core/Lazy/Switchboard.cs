@@ -11,8 +11,15 @@ namespace Nuclear.Lazy
 {
     public class Switchboard : Bus
     {
+        /*
         private readonly Dictionary<Type, List<Action<Message>>> _routes
             = new Dictionary<Type, List<Action<Message>>>();
+        */
+
+        // Change into string as key to easier switch between implementation namespaces etc...
+        // SEE The JustGiving event store code on github for clarity...
+        private readonly Dictionary<string, List<Action<Message>>> _routes
+            = new Dictionary<string, List<Action<Message>>>();
 
 
         public Action<object, Command> CommandSent
@@ -31,10 +38,10 @@ namespace Nuclear.Lazy
         {
             List<Action<Message>> handlers;
 
-            if (!_routes.TryGetValue(typeof(T), out handlers))
+            if (!_routes.TryGetValue(typeof(T).Name, out handlers))
             {
                 handlers = new List<Action<Message>>();
-                _routes.Add(typeof(T), handlers);
+                _routes.Add(typeof(T).Name, handlers);
             }
 
             handlers.Add((x => handler((T)x)));
@@ -45,10 +52,10 @@ namespace Nuclear.Lazy
         {
             List<Action<Message>> handlers;
 
-            if (!_routes.TryGetValue(typeof(T), out handlers))
+            if (!_routes.TryGetValue(typeof(T).Name, out handlers))
             {
                 handlers = new List<Action<Message>>();
-                _routes.Add(typeof(T), handlers);
+                _routes.Add(typeof(T).Name, handlers);
             }
 
             handlers.Add((x => handler((T)x)));
@@ -57,19 +64,62 @@ namespace Nuclear.Lazy
 
         public void Send<T>(T command) where T : Command
         {
+            string commandTypeName = command.GetType().Name;
             List<Action<Message>> handlers;
+            bool commandHandlerFound = false;
 
-            if (_routes.TryGetValue(typeof(T), out handlers))
+            commandHandlerFound = _routes.TryGetValue(commandTypeName, out handlers);
+
+            if (commandHandlerFound)
             {
-                if (handlers.Count != 1) throw new InvalidOperationException("cannot send to more than one command executor");
+                if (handlers.Count != 1)
+                {
+                    throw new InvalidOperationException("cannot send to more than one command executor");
+                }
+                // handlers[0](command);
+            }
+            else if (_routes.ContainsKey(commandTypeName))
+            {
+                handlers = _routes[commandTypeName];
+                commandHandlerFound = handlers != null && handlers.Count != 0;
+
+                if (commandHandlerFound)
+                {
+                    handlers[0](command);
+                }
+
+                if (handlers != null && handlers.Count != 1)
+                {
+                    throw new InvalidOperationException("cannot send to more than one command executor");
+                }
+            }
+
+
+            //
+            // Exec command if handler was found...
+            if (commandHandlerFound)
+            {
                 handlers[0](command);
             }
-            else
+            else // Debug stuff...
             {
-                throw new InvalidOperationException("no handler registered");
+                String routes = "";
+                foreach (var key in _routes.Keys)
+                {
+                    routes += " [" + key + ":";
+                    var funcs = _routes[key];
+                    foreach (var f in funcs)
+                    {
+                        routes += " . " + f.Method.Name;
+                    }
+                    routes += "] ";
+                }
+
+                throw new InvalidOperationException("No handler registered for " + commandTypeName + " (" + routes + ")");
             }
 
-            if (CommandSent != null)
+
+            if (commandHandlerFound && CommandSent != null)
             {
                 CommandSent(this, command);
             }
@@ -79,9 +129,8 @@ namespace Nuclear.Lazy
         {
             List<Action<Message>> handlers;
 
-            if (!_routes.TryGetValue(@event.GetType(), out handlers))
+            if (!_routes.TryGetValue(@event.GetType().Name, out handlers))
             {
-
                 return;
             }
 
