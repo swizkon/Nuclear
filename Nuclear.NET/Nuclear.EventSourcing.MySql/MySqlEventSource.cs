@@ -1,8 +1,11 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using NHibernate;
 using Nuclear.Domain;
 using Nuclear.Messaging;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,19 +17,102 @@ namespace Nuclear.EventSourcing.MySql
         private const string EventClrTypeHeader = "EventClrTypeName";
         private const string AggregateClrTypeHeader = "AggregateClrTypeName";
         private const string CommitIdHeader = "CommitId";
-        private const int WritePageSize = 500;
-        private const int ReadPageSize = 500;
+
+
+        private readonly Func<Type, Guid, string> _aggregateIdToStreamName;
+
+        private readonly ISession session;
+
+        private EventDispatcher _publisher;
+        
+        public MySqlEventSource(ISession session, EventDispatcher publisher)
+        {
+            _publisher = publisher;
+            this.session = session;
+            _aggregateIdToStreamName = (t, g) => string.Format("{0}-{1}", char.ToLower(t.Name[0]) + t.Name.Substring(1), g);
+        }
 
         public void SaveEvents(Aggregate aggregate, Guid aggregateId, IEnumerable<Event> events)
         {
-            throw new NotImplementedException();
+            var commitHeaders = new Dictionary<string, object>
+            {
+                {CommitIdHeader, Guid.NewGuid()},
+                {AggregateClrTypeHeader, aggregate.GetType().AssemblyQualifiedName}
+            };
+
+            // updateHeaders(commitHeaders);
+
+            var streamName = _aggregateIdToStreamName(aggregate.GetType(), aggregate.AggregateId);
+            var newEvents = aggregate.GetUncommittedChanges().Cast<object>().ToList();
+
+
+            var preparedEvents = PrepareEvents(newEvents, commitHeaders).ToList();
+
+            using (ITransaction tx = this.session.BeginTransaction())
+            {
+                foreach (var uncommittedEvent in preparedEvents)
+                {
+                    var entry = new RecordedEvent()
+                    {
+                        Created = DateTime.UtcNow,
+                        CreatedEpoch = (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds,
+                        Data = uncommittedEvent.Data,
+                        EventId = uncommittedEvent.EventId,
+                        EventStreamId = streamName,
+                        IsJson = uncommittedEvent.IsJson,
+                        EventType = uncommittedEvent.Type,
+                        Metadata = uncommittedEvent.Metadata,
+                        EventNumber = uncommittedEvent.position
+                    };
+                    session.Save(entry);
+                }
+
+                tx.Commit();
+            }
+
+
+
+            foreach (var @event in aggregate.GetUncommittedChanges())
+            {
+                _publisher.Publish(@event);
+            }
+
+            aggregate.ClearUncommittedEvents();
+
         }
+
 
         public List<Event> GetEventsForAggregate(Aggregate aggregate, Guid aggregateId)
         {
-            throw new NotImplementedException();
+            List<Event> eventsForAggregate = new List<Event>();
+
+            var streamName = _aggregateIdToStreamName(aggregate.GetType(), aggregateId);
+
+            var events = session
+                        .QueryOver<RecordedEvent>()
+                        .Where(e => e.EventStreamId == streamName)
+                        .Future();
+
+            foreach (var evnt in events)
+            {
+                Event aggrEvent = (Event)DeserializeEvent(evnt.Metadata, evnt.Data);
+                eventsForAggregate.Add(aggrEvent);
+            }
+
+            return eventsForAggregate;
         }
 
+
+        object DeserializeEvent(byte[] metadata, byte[] data)
+        {
+            var eventClrTypeName = JObject.Parse(Encoding.UTF8.GetString(metadata)).Property(EventClrTypeHeader).Value;
+            return JsonConvert.DeserializeObject(Encoding.UTF8.GetString(data), Type.GetType((string)eventClrTypeName));
+        }
+
+        private static IEnumerable<EventData> PrepareEvents(IEnumerable<object> events, IDictionary<string, object> commitHeaders)
+        {
+            return events.Select(e => JsonEventData.Create(Guid.NewGuid(), e, commitHeaders));
+        }
 
         private static class JsonEventData
         {

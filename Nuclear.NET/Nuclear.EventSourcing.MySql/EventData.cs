@@ -7,6 +7,7 @@ namespace Nuclear.EventSourcing.MySql
 {
     public sealed class EventData
     {
+        public readonly int position;
 
         public readonly byte[] Data;
 

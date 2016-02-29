@@ -54,6 +54,8 @@
     <Compile Include="EventData.cs" />
     <Compile Include="MySqlEventSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RecordedEvent.cs" />
+    <Compile Include="RecordedEventMap.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Nuclear.Core\Nuclear.Core.csproj">
