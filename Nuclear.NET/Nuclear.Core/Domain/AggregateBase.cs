@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Nuclear.Extensions;
+﻿using Nuclear.Extensions;
 using Nuclear.Messaging;
+using System;
+using System.Collections.Generic;
 
 namespace Nuclear.Domain
 {
@@ -13,14 +9,13 @@ namespace Nuclear.Domain
     {
         private readonly List<Event> _changes = new List<Event>();
 
-        // public abstract Guid Id { get; }
+        protected Guid Id;
 
         public Guid AggregateId
         {
             get { return this.Id; }
         }
 
-        protected Guid Id; // { get; }
         public int Version { get; internal set; }
 
         protected AggregateBase(Guid id)

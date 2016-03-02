@@ -21,15 +21,15 @@ namespace Nuclear.EventSourcing.MySql
 
         private readonly Func<Type, Guid, string> _aggregateIdToStreamName;
 
-        private readonly ISession session;
+        private readonly ISessionFactory factory;
 
         private EventDispatcher _publisher;
-        
-        public MySqlEventSource(ISession session, EventDispatcher publisher)
+
+        public MySqlEventSource(ISessionFactory factory, EventDispatcher publisher)
         {
-            _publisher = publisher;
-            this.session = session;
-            _aggregateIdToStreamName = (t, g) => string.Format("{0}-{1}", char.ToLower(t.Name[0]) + t.Name.Substring(1), g);
+            this._publisher = publisher;
+            this.factory = factory;
+            this._aggregateIdToStreamName = (t, g) => string.Format("{0}-{1}", char.ToLower(t.Name[0]) + t.Name.Substring(1), g);
         }
 
         public void SaveEvents(Aggregate aggregate, Guid aggregateId, IEnumerable<Event> events)
@@ -46,9 +46,12 @@ namespace Nuclear.EventSourcing.MySql
             var newEvents = aggregate.GetUncommittedChanges().Cast<object>().ToList();
 
 
+            var eventNumber = aggregate.Version;
+
             var preparedEvents = PrepareEvents(newEvents, commitHeaders).ToList();
 
-            using (ITransaction tx = this.session.BeginTransaction())
+            using (ISession session = this.factory.OpenSession())
+            using (ITransaction tx = session.BeginTransaction())
             {
                 foreach (var uncommittedEvent in preparedEvents)
                 {
@@ -62,9 +65,10 @@ namespace Nuclear.EventSourcing.MySql
                         IsJson = uncommittedEvent.IsJson,
                         EventType = uncommittedEvent.Type,
                         Metadata = uncommittedEvent.Metadata,
-                        EventNumber = uncommittedEvent.position
+                        EventNumber = eventNumber
                     };
                     session.Save(entry);
+                    eventNumber += 1;
                 }
 
                 tx.Commit();
@@ -88,15 +92,20 @@ namespace Nuclear.EventSourcing.MySql
 
             var streamName = _aggregateIdToStreamName(aggregate.GetType(), aggregateId);
 
-            var events = session
-                        .QueryOver<RecordedEvent>()
-                        .Where(e => e.EventStreamId == streamName)
-                        .Future();
-
-            foreach (var evnt in events)
+            using (ISession session = this.factory.OpenSession())
+            using (ITransaction tx = session.BeginTransaction())
             {
-                Event aggrEvent = (Event)DeserializeEvent(evnt.Metadata, evnt.Data);
-                eventsForAggregate.Add(aggrEvent);
+                var events = session
+                            .QueryOver<RecordedEvent>()
+                            .Where(e => e.EventStreamId == streamName)
+                            .OrderBy(e => e.EventNumber).Asc
+                            .Future();
+
+                foreach (var evnt in events)
+                {
+                    Event aggrEvent = (Event)DeserializeEvent(evnt.Metadata, evnt.Data);
+                    eventsForAggregate.Add(aggrEvent);
+                }
             }
 
             return eventsForAggregate;

@@ -8,42 +8,41 @@ namespace Nuclear.EventSourcing.MySql
 {
     public class RecordedEvent
     {
-
         // Summary:
         //     A datetime representing when this event was created in the system
-        public DateTime Created;
+        public virtual DateTime Created { get; set; }
         //
         // Summary:
         //     A long representing the milliseconds since the epoch when the was created
         //     in the system
-        public long CreatedEpoch;
+        public virtual long CreatedEpoch { get; set; }
         //
         // Summary:
         //     A byte array representing the data of this event
-        public byte[] Data;
+        public virtual byte[] Data { get; set; }
         //
         // Summary:
         //     The Unique Identifier representing this event
-        public Guid EventId;
+        public virtual Guid EventId { get; set; }
         //
         // Summary:
         //     The number of this event in the stream
-        public int EventNumber;
+        public virtual int EventNumber { get; set; }
         //
         // Summary:
         //     The Event Stream that this event belongs to
-        public string EventStreamId;
+        public virtual string EventStreamId { get; set; }
         //
         // Summary:
         //     The type of event this is
-        public string EventType;
+        public virtual string EventType { get; set; }
         //
         // Summary:
         //     Indicates whether the content is internally marked as json
-        public bool IsJson;
+        public virtual bool IsJson { get; set; }
         //
         // Summary:
         //     A byte array representing the metadata associated with this event
-        public byte[] Metadata;
+        public virtual byte[] Metadata { get; set; }
     }
 }
