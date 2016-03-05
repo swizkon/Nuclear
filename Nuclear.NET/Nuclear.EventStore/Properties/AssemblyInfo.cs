@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Nuclear.EventStore")]
-[assembly: AssemblyDescription("Using EventStore infrastructure")]
+[assembly: AssemblyDescription("Event sourcing persistance implementation using EventStore (geteventstore.com)")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Jonas Jerndin")]
 [assembly: AssemblyProduct("Nuclear.EventStore")]
-[assembly: AssemblyCopyright("Copyright ©  2015")]
+[assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
