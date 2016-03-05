@@ -1,6 +1,10 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NHibernate;
+using NHibernate.Cfg;
+using NHibernate.Cfg.MappingSchema;
+using NHibernate.Dialect;
+using NHibernate.Mapping.ByCode;
 using Nuclear.Domain;
 using Nuclear.Messaging;
 using System;
@@ -18,17 +22,33 @@ namespace Nuclear.EventSourcing.MySql
         private const string AggregateClrTypeHeader = "AggregateClrTypeName";
         private const string CommitIdHeader = "CommitId";
 
-
         private readonly Func<Type, Guid, string> _aggregateIdToStreamName;
 
         private readonly ISessionFactory factory;
 
         private EventDispatcher _publisher;
 
-        public MySqlEventSource(ISessionFactory factory, EventDispatcher publisher)
+        public MySqlEventSource(MySqlConnectionString connectionString, EventDispatcher publisher)
         {
+            var cfg = new Configuration()
+                    .DataBaseIntegration(db =>
+                    {
+                        db.ConnectionString = (String)connectionString;
+                        db.Dialect<MySQLDialect>();
+                    });
+
+            /* Add the mapping we defined: */
+            var mapper = new ModelMapper();
+            // mapper.AddMappings(Assembly.GetExecutingAssembly().GetExportedTypes());
+            mapper.AddMapping(typeof(RecordedEventMap));
+            HbmMapping mapping = mapper.CompileMappingForAllExplicitlyAddedEntities();
+            cfg.AddMapping(mapping);
+
+
+            this.factory = cfg.BuildSessionFactory();
+
+
             this._publisher = publisher;
-            this.factory = factory;
             this._aggregateIdToStreamName = (t, g) => string.Format("{0}-{1}", char.ToLower(t.Name[0]) + t.Name.Substring(1), g);
         }
 
