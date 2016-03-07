@@ -20,8 +20,6 @@ namespace Nuclear.Domain
 
         protected AggregateBase(Guid id)
         {
-            // this.Version += 1;
-            Console.WriteLine("Contructing " + this.GetType().Name + " with Id: " + id.ToString());
             this.Id = id;
         }
 
@@ -37,31 +35,51 @@ namespace Nuclear.Domain
 
         public void LoadsFromHistory(IEnumerable<Event> history)
         {
-            Console.WriteLine("-".PadLeft(76, '-'));
-            Console.WriteLine("LoadsFromHistory...");
-
             foreach (var e in history)
-                ApplyChange(e, false);
+            {
+                applyChange(e);
+            }
         }
 
-        protected void ApplyChange(Event @event)
+        /*
+        protected void AcceptChange(Event @event)
         {
             ApplyChange(@event, true);
         }
+        */
 
+        protected void AcceptChange<TEvent>(TEvent domainEvent)
+            where TEvent : Event
+        {
+            _changes.Add(domainEvent);
+
+            applyChange(domainEvent);
+        }
+
+        /*
+        protected void AcceptChange<TEvent>(TEvent domainEvent, Action<TEvent> apply)
+            where TEvent : Event
+        {
+            Console.WriteLine("Accept: " + domainEvent.GetType().Name);
+            apply(domainEvent);
+        }*/
+
+        private void applyChange(Event @event)
+        {
+            this.Version += 1;
+            this.AsDynamic().Apply(@event);
+        }
+
+        /*
         // push atomic aggregate changes to local history for further processing (EventStore.SaveEvents)
         private void ApplyChange(Event @event, bool isNew)
         {
             this.Version += 1;
-            /*
-            if (!isNew)
-            else
-                this.Version += 1;
-            */
 
             this.AsDynamic().Apply(@event);
 
             if (isNew) _changes.Add(@event);
         }
+        */
     }
 }

@@ -100,7 +100,6 @@ namespace Nuclear.EventStore
                 foreach (var evnt in currentSlice.Events)
                 {
                     Event aggrEvent = (Event)DeserializeEvent(evnt.OriginalEvent.Metadata, evnt.OriginalEvent.Data);
-                    // Console.WriteLine(aggrEvent);
                     eventsForAggregate.Add(aggrEvent);
                 }
 

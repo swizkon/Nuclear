@@ -61,7 +61,6 @@ namespace Nuclear.Lazy
                 // push event to the event descriptors list for current aggregate
                 eventDescriptors.Add(new EventDescriptor(aggregateId, @event, i));
 
-                Console.WriteLine("SaveEvents: ");
                 // publish current event to the bus for further processing by subscribers
                 _publisher.Publish(@event);
             }
