@@ -54,19 +54,25 @@ namespace Nuclear.EventSourcing.MySql
 
         public void SaveEvents(Aggregate aggregate, Guid aggregateId, IEnumerable<Event> events)
         {
+            SaveEvents(new AggregateKey(aggregate.GetType(), aggregate.AggregateId), aggregate.Revision, events);
+            aggregate.ClearUncommittedEvents();
+        }
+
+        public void SaveEvents(AggregateKey key, int expectedRevision, IEnumerable<Event> events)
+        {
             var commitHeaders = new Dictionary<string, object>
             {
                 {CommitIdHeader, Guid.NewGuid()},
-                {AggregateClrTypeHeader, aggregate.GetType().AssemblyQualifiedName}
+                {AggregateClrTypeHeader, key.AggregateType.AssemblyQualifiedName}
             };
 
             // updateHeaders(commitHeaders);
 
-            var streamName = _aggregateIdToStreamName(aggregate.GetType(), aggregate.AggregateId);
-            var newEvents = aggregate.GetUncommittedChanges().Cast<object>().ToList();
+            var streamName = _aggregateIdToStreamName(key.AggregateType, key.AggregateId);
+            var newEvents = events.Cast<object>().ToList();
 
 
-            var eventNumber = aggregate.Version;
+            var eventNumber = expectedRevision;
 
             var preparedEvents = PrepareEvents(newEvents, commitHeaders).ToList();
 
@@ -94,23 +100,24 @@ namespace Nuclear.EventSourcing.MySql
                 tx.Commit();
             }
 
-
-
-            foreach (var @event in aggregate.GetUncommittedChanges())
+            foreach (var @event in events)
             {
                 _publisher.Publish(@event);
             }
-
-            aggregate.ClearUncommittedEvents();
-
         }
 
 
-        public List<Event> GetEventsForAggregate(Aggregate aggregate, Guid aggregateId)
+        public List<Event> EventsForAggregate(Aggregate aggregate)
+        {
+            return EventsForAggregate(new AggregateKey(aggregate.GetType(), aggregate.AggregateId));
+        }
+
+
+        public List<Event>EventsForAggregate(AggregateKey key)
         {
             List<Event> eventsForAggregate = new List<Event>();
 
-            var streamName = _aggregateIdToStreamName(aggregate.GetType(), aggregateId);
+            var streamName = _aggregateIdToStreamName(key.AggregateType, key.AggregateId);
 
             using (ISession session = this.factory.OpenSession())
             using (ITransaction tx = session.BeginTransaction())

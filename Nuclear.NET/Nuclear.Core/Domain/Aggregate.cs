@@ -10,10 +10,10 @@ namespace Nuclear.Domain
     public interface Aggregate
     {
         void LoadsFromHistory(IEnumerable<Event> history);
-        IEnumerable<Event> GetUncommittedChanges();
+        IEnumerable<Event> UncommittedChanges();
         void ClearUncommittedEvents();
 
         Guid AggregateId { get; }
-        int Version { get; }
+        int Revision { get; }
     }
 }

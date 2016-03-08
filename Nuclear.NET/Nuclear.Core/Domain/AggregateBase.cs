@@ -16,14 +16,14 @@ namespace Nuclear.Domain
             get { return this.Id; }
         }
 
-        public int Version { get; internal set; }
+        public int Revision { get; internal set; }
 
         protected AggregateBase(Guid id)
         {
             this.Id = id;
         }
 
-        public IEnumerable<Event> GetUncommittedChanges()
+        public IEnumerable<Event> UncommittedChanges()
         {
             return _changes;
         }
@@ -66,8 +66,13 @@ namespace Nuclear.Domain
 
         private void applyChange(Event @event)
         {
-            this.Version += 1;
+            this.bumpRevision();// += 1;
             this.AsDynamic().Apply(@event);
+        }
+
+        private void bumpRevision()
+        {
+            this.Revision += 1;
         }
 
         /*

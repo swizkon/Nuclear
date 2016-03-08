@@ -10,8 +10,7 @@ using System.Text;
 
 namespace Nuclear.EventStore
 {
-    public class EventStoreRepository
-        : IAggregateEventStore //<AggregateRoot> IEventStore,
+    public class EventStoreRepository : IAggregateEventStore
     {
         private const string EventClrTypeHeader = "EventClrTypeName";
         private const string AggregateClrTypeHeader = "AggregateClrTypeName";
@@ -82,11 +81,17 @@ namespace Nuclear.EventStore
 
 
 
-        public List<Event> GetEventsForAggregate(Aggregate aggregate, Guid aggregateId)
+        public List<Event> EventsForAggregate(Aggregate aggregate)
+        {
+            return EventsForAggregate(new AggregateKey(aggregate.GetType(), aggregate.AggregateId));
+        }
+
+
+        public List<Event> EventsForAggregate(AggregateKey key)
         {
             List<Event> eventsForAggregate = new List<Event>();
 
-            var streamName = _aggregateIdToStreamName(aggregate.GetType(), aggregateId);
+            var streamName = _aggregateIdToStreamName(key.AggregateType, key.AggregateId);
 
             StreamEventsSlice currentSlice;
             var nextSliceStart = 0;
@@ -108,22 +113,30 @@ namespace Nuclear.EventStore
             return eventsForAggregate;
         }
 
+
+        /*
+         
+        List<Nuclear.Messaging.Event> EventsForAggregate(Aggregate aggregate);
+        List<Nuclear.Messaging.Event> EventsForAggregate(AggregateKey key);
+         */
+
         public void SaveEvents(Aggregate aggregate, Guid aggregateId, IEnumerable<Event> uncommittedEvents)
         {
-            // throw new NotImplementedException();
+            SaveEvents(new AggregateKey(aggregate.GetType(), aggregate.AggregateId), aggregate.Revision, uncommittedEvents);
+            aggregate.ClearUncommittedEvents();
+        }
 
+        public void SaveEvents(AggregateKey key, int expectedRevision, IEnumerable<Event> uncommittedEvents)
+        {
             var commitHeaders = new Dictionary<string, object>
             {
                 {CommitIdHeader, Guid.NewGuid()},
-                {AggregateClrTypeHeader, aggregate.GetType().AssemblyQualifiedName}
+                {AggregateClrTypeHeader, key.AggregateType.AssemblyQualifiedName}
             };
 
-            // updateHeaders(commitHeaders);
-
-            var streamName = _aggregateIdToStreamName(aggregate.GetType(), aggregate.AggregateId);
-            var newEvents = aggregate.GetUncommittedChanges().Cast<object>().ToList();
-            var originalVersion = aggregate.Version; // -newEvents.Count;
-            var expectedVersion = originalVersion <= 0 ? ExpectedVersion.NoStream : originalVersion - 1;
+            var streamName = _aggregateIdToStreamName(key.AggregateType, key.AggregateId);
+            var newEvents = uncommittedEvents.Cast<object>().ToList();
+            var expectedVersion = expectedRevision <= 0 ? ExpectedVersion.NoStream : expectedRevision - 1;
 
             expectedVersion = ExpectedVersion.Any;
 
@@ -152,13 +165,10 @@ namespace Nuclear.EventStore
                 transaction.CommitAsync().Wait();
             }
 
-            foreach (var @event in aggregate.GetUncommittedChanges())
+            foreach (var @event in uncommittedEvents)
             {
                 _publisher.Publish(@event);
             }
-
-            aggregate.ClearUncommittedEvents();
-
         }
     }
 

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Nuclear.EventSourcing
 {
     public class EventSourcedAggregateRepository<TAggregate>
-        : AggregateRepository<TAggregate> where TAggregate // , AggregateRoot
+        : AggregateRepository<TAggregate> where TAggregate
         : class, Aggregate
     {
         private readonly IAggregateEventStore _storage;
@@ -20,7 +20,7 @@ namespace Nuclear.EventSourcing
 
         public void Save(Aggregate aggregate)
         {
-            _storage.SaveEvents(aggregate, aggregate.AggregateId, aggregate.GetUncommittedChanges());
+            _storage.SaveEvents(aggregate, aggregate.AggregateId, aggregate.UncommittedChanges());
         }
 
         public TAggregate GetById(Guid id)
@@ -29,8 +29,7 @@ namespace Nuclear.EventSourcing
 
             TAggregate obj = (TAggregate)Activator.CreateInstance(typeof(TAggregate), id);
             // Activator.CreateInstance(typeof(T), id);
-
-            var e = _storage.GetEventsForAggregate(obj, id);
+            var e = _storage.EventsForAggregate(obj);
             obj.LoadsFromHistory(e);
             return obj;
         }
