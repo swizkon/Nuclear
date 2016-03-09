@@ -8,17 +8,20 @@ using System.Threading.Tasks;
 
 namespace Nuclear.Lazy
 {
+    /// <summary>
+    /// In memory for read / write and publishing of domain events.
+    /// </summary>
     public class InMemEventStore : IAggregateEventStore
     {
         private readonly EventDispatcher _publisher;
 
         private struct EventDescriptor
         {
-            public readonly Event EventData;
+            public readonly DomainEvent EventData;
             public readonly Guid Id;
             public readonly int Revision;
 
-            public EventDescriptor(Guid id, Event eventData, int revision)
+            public EventDescriptor(Guid id, DomainEvent eventData, int revision)
             {
                 EventData = eventData;
                 Revision = revision;
@@ -26,6 +29,10 @@ namespace Nuclear.Lazy
             }
         }
 
+        /// <summary>
+        /// Ctor with EventDispatcher dependency.
+        /// </summary>
+        /// <param name="publisher"></param>
         public InMemEventStore(EventDispatcher publisher)
         {
             _publisher = publisher;
@@ -33,12 +40,23 @@ namespace Nuclear.Lazy
 
         private readonly Dictionary<Guid, List<EventDescriptor>> _current = new Dictionary<Guid, List<EventDescriptor>>();
 
-        public void SaveEvents(Aggregate aggregate, Guid aggregateId, IEnumerable<Event> events)
+        /// <summary>
+        /// Stores the aggregate changes.
+        /// </summary>
+        /// <param name="aggregate"></param>
+        public void SaveChanges(Aggregate aggregate)
         {
-            SaveEvents(new AggregateKey(aggregate.GetType(), aggregate.AggregateId), aggregate.Revision, events);
+            SaveEvents(new AggregateKey(aggregate), aggregate.Revision, aggregate.UncommittedChanges());
+            aggregate.ClearUncommittedEvents();
         }
 
-        public void SaveEvents(AggregateKey key, int expectedRevision, IEnumerable<Event> events)
+        /// <summary>
+        /// Saves the events for an aggregate that might be unknown to the system.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="expectedRevision"></param>
+        /// <param name="events"></param>
+        public void SaveEvents(AggregateKey key, int expectedRevision, IEnumerable<DomainEvent> events)
         {
             List<EventDescriptor> eventDescriptors;
 
@@ -66,18 +84,28 @@ namespace Nuclear.Lazy
                 // push event to the event descriptors list for current aggregate
                 eventDescriptors.Add(new EventDescriptor(key.AggregateId, @event, i));
                 // publish current event to the bus for further processing by subscribers
-                _publisher.Publish(@event);
+                _publisher.Publish(@event as Event);
             }
         }
 
-        // collect all processed events for given aggregate and return them as a list
-        // used to build up an aggregate from its history (Domain.LoadsFromHistory)
-        public List<Event> EventsForAggregate(Aggregate aggregate)
+        /// <summary>
+        /// Collects all processed events for given aggregate and return them as a list
+        /// used to build up an aggregate from its history (Domain.ReconstituteFromHistory)
+        /// </summary>
+        /// <param name="aggregate"></param>
+        /// <returns></returns>
+        public List<DomainEvent> EventsForAggregate(Aggregate aggregate)
         {
-            return EventsForAggregate(new AggregateKey(aggregate.GetType(), aggregate.AggregateId));
+            return EventsForAggregate(new AggregateKey(aggregate));
         }
 
-        public List<Event> EventsForAggregate(AggregateKey key)
+        /// <summary>
+        /// Collects all processed events for given aggregate and return them as a list
+        /// used to build up an aggregate from its history (Domain.ReconstituteFromHistory)
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public List<DomainEvent> EventsForAggregate(AggregateKey key)
         {
             List<EventDescriptor> eventDescriptors;
 
@@ -90,11 +118,16 @@ namespace Nuclear.Lazy
         }
     }
 
-
+    /// <summary>
+    /// 
+    /// </summary>
     public class AggregateNotFoundException : Exception
     {
     }
 
+    /// <summary>
+    /// Indicates thsat the expected version did not match.
+    /// </summary>
     public class ConcurrencyException : Exception
     {
     }

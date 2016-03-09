@@ -9,19 +9,17 @@ using System.Threading.Tasks;
 
 namespace Nuclear.Lazy
 {
+    /// <summary>
+    /// Simple RAM implementation of a Bus interface.
+    /// </summary>
     public class Switchboard : Bus
     {
-        /*
-        private readonly Dictionary<Type, List<Action<Message>>> _routes
-            = new Dictionary<Type, List<Action<Message>>>();
-        */
-
         // Change into string as key to easier switch between implementation namespaces etc...
         // SEE The JustGiving event store code on github for clarity...
         private readonly Dictionary<string, List<Action<Message>>> _routes
             = new Dictionary<string, List<Action<Message>>>();
 
-
+        /*
         public Action<object, Command> CommandSent
         {
             get;
@@ -33,7 +31,13 @@ namespace Nuclear.Lazy
             get;
             set;
         }
+        */
 
+        /// <summary>
+        /// Register a handle for a command
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="handler"></param>
         public void RegisterHandler<T>(Action<T> handler) where T : Command
         {
             List<Action<Message>> handlers;
@@ -48,7 +52,12 @@ namespace Nuclear.Lazy
         }
 
 
-        public void RegisterSubscriber<T>(Action<T> handler) where T : Event
+        /// <summary>
+        /// Register a subscriber for an event.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="subscriber"></param>
+        public void RegisterSubscriber<T>(Action<T> subscriber) where T : Event
         {
             List<Action<Message>> handlers;
 
@@ -58,10 +67,15 @@ namespace Nuclear.Lazy
                 _routes.Add(typeof(T).Name, handlers);
             }
 
-            handlers.Add((x => handler((T)x)));
+            handlers.Add((x => subscriber((T)x)));
         }
 
 
+        /// <summary>
+        /// Send a command
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="command"></param>
         public void Send<T>(T command) where T : Command
         {
             string commandTypeName = command.GetType().Name;
@@ -118,13 +132,19 @@ namespace Nuclear.Lazy
                 throw new InvalidOperationException("No handler registered for " + commandTypeName + " (" + routes + ")");
             }
 
-
+            /*
             if (commandHandlerFound && CommandSent != null)
             {
                 CommandSent(this, command);
             }
+            */
         }
 
+        /// <summary>
+        /// Publish an event to all subscribers
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="event"></param>
         public void Publish<T>(T @event) where T : Event
         {
             List<Action<Message>> handlers;
@@ -141,9 +161,10 @@ namespace Nuclear.Lazy
                 ThreadPool.QueueUserWorkItem(x => handler1(@event));
                 // handler1(@event);
             }
-
+            /*
             if (EventPublished != null)
                 EventPublished(this, @event);
+            */
         }
 
     }

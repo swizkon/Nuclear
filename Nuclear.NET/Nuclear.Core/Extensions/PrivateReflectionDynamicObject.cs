@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Nuclear.Extensions
 {
@@ -247,8 +245,16 @@ namespace Nuclear.Extensions
     }
 
 
+    /// <summary>
+    /// Extension class for easy reflection of an object private parts...
+    /// </summary>
     public static class PrivateReflectionDynamicObjectExtensions
     {
+        /// <summary>
+        /// Exposes an objects internals for the calling code.
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns></returns>
         public static dynamic AsDynamic(this object o)
         {
             return PrivateReflectionDynamicObject.WrapObjectIfNeeded(o);

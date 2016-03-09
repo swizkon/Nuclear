@@ -1,16 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Nuclear.Domain
 {
-
-    public interface AggregateRepository<T> where T
-        : Aggregate
+    /// <summary>
+    /// Interface for handling re-constitution and persistence of aggregates.
+    /// </summary>
+    /// <typeparam name="TAggregate"></typeparam>
+    public interface AggregateRepository<TAggregate>
+        where TAggregate : Aggregate
     {
-        void Save(Aggregate aggregate);
-        T GetById(Guid id);
+        /// <summary>
+        /// Saves the uncommitted changes to the underlying storage engine.
+        /// </summary>
+        /// <param name="aggregate"></param>
+        void Save(TAggregate aggregate);
+
+        /// <summary>
+        /// Returns a reconstituted object graph for an aggregate.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        TAggregate GetById(Guid id);
     }
 }

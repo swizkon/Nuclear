@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace Nuclear.Messaging
 {
-    public interface Command 
-        : Message
+    /// <summary>
+    /// Marker interface for a class that is a command
+    /// </summary>
+    public interface Command : Message
     {
     }
 }

@@ -5,35 +5,64 @@ using System.Collections.Generic;
 
 namespace Nuclear.Domain
 {
+    /// <summary>
+    /// The base class for a Event sourced aggregate
+    /// </summary>
     public abstract class AggregateBase : Aggregate
     {
-        private readonly List<Event> _changes = new List<Event>();
+        private readonly List<DomainEvent> _changes = new List<DomainEvent>();
 
+        /// <summary>
+        /// Internal Id for this aggregate.
+        /// </summary>
         protected Guid Id;
 
+        /// <summary>
+        /// The Id of this aggregate.
+        /// </summary>
         public Guid AggregateId
         {
             get { return this.Id; }
         }
 
+        /// <summary>
+        /// The revision, ie number of domain events processed since constructed.
+        /// </summary>
         public int Revision { get; internal set; }
 
+        /// <summary>
+        /// Base ctor to ensure the Id to always be available. 
+        /// </summary>
+        /// <param name="id"></param>
         protected AggregateBase(Guid id)
         {
             this.Id = id;
         }
 
-        public IEnumerable<Event> UncommittedChanges()
+        /// <summary>
+        /// Returns the changes to an aggregate after its last reconstitution.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<DomainEvent> UncommittedChanges()
         {
             return _changes;
         }
 
+        /// <summary>
+        /// Clears the changes.
+        /// TODO Maybe merge this and UncommittedChanges() into COmmitChanges(Irepository).
+        /// which should allow side effects on the aggregate...
+        /// </summary>
         public void ClearUncommittedEvents()
         {
             _changes.Clear();
         }
 
-        public void LoadsFromHistory(IEnumerable<Event> history)
+        /// <summary>
+        /// Takes domain events and applies them to the object graph.
+        /// </summary>
+        /// <param name="history"></param>
+        public void ReconstituteFromHistory(IEnumerable<DomainEvent> history)
         {
             foreach (var e in history)
             {
@@ -41,32 +70,23 @@ namespace Nuclear.Domain
             }
         }
 
-        /*
-        protected void AcceptChange(Event @event)
-        {
-            ApplyChange(@event, true);
-        }
-        */
-
+        /// <summary>
+        /// Adds the domain event to the changes and applies it to the object
+        /// using AsDynamic().
+        /// The class MUST have a Apply(TEvent domainEvent)
+        /// </summary>
+        /// <typeparam name="TEvent"></typeparam>
+        /// <param name="domainEvent"></param>
         protected void AcceptChange<TEvent>(TEvent domainEvent)
-            where TEvent : Event
+            where TEvent : DomainEvent
         {
             _changes.Add(domainEvent);
-
             applyChange(domainEvent);
         }
 
-        /*
-        protected void AcceptChange<TEvent>(TEvent domainEvent, Action<TEvent> apply)
-            where TEvent : Event
+        private void applyChange(DomainEvent @event)
         {
-            Console.WriteLine("Accept: " + domainEvent.GetType().Name);
-            apply(domainEvent);
-        }*/
-
-        private void applyChange(Event @event)
-        {
-            this.bumpRevision();// += 1;
+            this.bumpRevision();
             this.AsDynamic().Apply(@event);
         }
 
@@ -75,16 +95,5 @@ namespace Nuclear.Domain
             this.Revision += 1;
         }
 
-        /*
-        // push atomic aggregate changes to local history for further processing (EventStore.SaveEvents)
-        private void ApplyChange(Event @event, bool isNew)
-        {
-            this.Version += 1;
-
-            this.AsDynamic().Apply(@event);
-
-            if (isNew) _changes.Add(@event);
-        }
-        */
     }
 }

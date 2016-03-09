@@ -9,7 +9,7 @@
     <projectUrl>https://github.com/swizkon/Nuclear</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>First package for nuget availability.</releaseNotes>
+    <releaseNotes>Refactoring to use more describing concepts. Added docs.</releaseNotes>
     <copyright>Copyright 2016</copyright>
     <tags>DDD CQRS EventSourcing</tags>
   </metadata>

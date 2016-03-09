@@ -7,30 +7,44 @@ using System.Threading.Tasks;
 
 namespace Nuclear.EventSourcing
 {
+    /// <summary>
+    /// Generic implementation of event sourced aggregate
+    /// </summary>
+    /// <typeparam name="TAggregate">The type of aggregate to act on</typeparam>
     public class EventSourcedAggregateRepository<TAggregate>
         : AggregateRepository<TAggregate> where TAggregate
         : class, Aggregate
     {
         private readonly IAggregateEventStore _storage;
 
+        /// <summary>
+        /// ctor
+        /// </summary>
+        /// <param name="storage"></param>
         public EventSourcedAggregateRepository(IAggregateEventStore storage)
         {
             _storage = storage;
         }
 
-        public void Save(Aggregate aggregate)
+        /// <summary>
+        /// Saves the uncommitted changes to the storage engine.
+        /// </summary>
+        /// <param name="aggregate"></param>
+        public void Save(TAggregate aggregate)
         {
-            _storage.SaveEvents(aggregate, aggregate.AggregateId, aggregate.UncommittedChanges());
+            _storage.SaveChanges(aggregate);
         }
 
+        /// <summary>
+        /// Returns a reconstituted object graph for an aggregate.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public TAggregate GetById(Guid id)
         {
-            // var obj = new T(); // lots of ways to do this
-
             TAggregate obj = (TAggregate)Activator.CreateInstance(typeof(TAggregate), id);
-            // Activator.CreateInstance(typeof(T), id);
             var e = _storage.EventsForAggregate(obj);
-            obj.LoadsFromHistory(e);
+            obj.ReconstituteFromHistory(e);
             return obj;
         }
     }

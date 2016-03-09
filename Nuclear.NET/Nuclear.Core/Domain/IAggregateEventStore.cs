@@ -1,24 +1,38 @@
-﻿using Nuclear.Messaging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Nuclear.Domain
 {
-
+    /// <summary>
+    /// Interface for read / write of domain events.
+    /// </summary>
     public interface IAggregateEventStore
     {
-        void SaveEvents(Aggregate aggregate, Guid aggregateId, IEnumerable<Event> events);
+        /// <summary>
+        /// Stores the aggregate changes.
+        /// </summary>
+        /// <param name="aggregate"></param>
+        void SaveChanges(Aggregate aggregate);
 
-        void SaveEvents(AggregateKey key, int expectedRevision, IEnumerable<Event> events);
-        
-        // List<Event> GetEventsForAggregate(Aggregate aggregate, Guid aggregateId);
+        /// <summary>
+        /// Saves the events for an aggregate that might be unknown to the system.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="expectedRevision"></param>
+        /// <param name="events"></param>
+        void SaveEvents(AggregateKey key, int expectedRevision, IEnumerable<DomainEvent> events);
 
-        List<Event> EventsForAggregate(Aggregate aggregate);
+        /// <summary>
+        /// Returns the events for a known aggregate
+        /// </summary>
+        /// <param name="aggregate"></param>
+        /// <returns></returns>
+        List<DomainEvent> EventsForAggregate(Aggregate aggregate);
 
-        List<Event> EventsForAggregate(AggregateKey key);
+        /// <summary>
+        /// Returns the domain events for a possible unknown aggregate.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        List<DomainEvent> EventsForAggregate(AggregateKey key);
     }
-
 }

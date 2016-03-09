@@ -1,13 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace Nuclear.Messaging
 {
-    public interface SubscribesTo<T> where T : Event
+    /// <summary>
+    /// Interface for mapping subscribers to events.
+    /// 
+    /// </summary>
+    /// <typeparam name="TEvent"></typeparam>
+    public interface SubscribesTo<TEvent> where TEvent : Event
     {
-        void Handle(T @event);
+        /// <summary>
+        /// The metod that handles the event message.
+        /// </summary>
+        /// <param name="event"></param>
+        void Consume(TEvent @event);
     }
 }

@@ -6,8 +6,16 @@ using System.Threading.Tasks;
 
 namespace Nuclear.Messaging
 {
-    public interface Handles<T> where T : Message
+    /// <summary>
+    /// Interface for command handlers.
+    /// </summary>
+    /// <typeparam name="TCommand"></typeparam>
+    public interface Handles<TCommand> where TCommand : Command
     {
-        void Handle(T message);
+        /// <summary>
+        /// Place for real logic or piping to the domain model.
+        /// </summary>
+        /// <param name="command"></param>
+        void Process(TCommand command);
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/*
 namespace Nuclear.Domain
 {
     public interface StreamAggregate
@@ -17,3 +18,4 @@ namespace Nuclear.Domain
         // int Version { get; }
     }
 }
+*/
