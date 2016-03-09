@@ -12,6 +12,7 @@ namespace Nuclear.EventStore
 {
     public class EventStoreRepository : IAggregateEventStore
     {
+
         private const string EventClrTypeHeader = "EventClrTypeName";
         private const string AggregateClrTypeHeader = "AggregateClrTypeName";
         private const string CommitIdHeader = "CommitId";
@@ -81,15 +82,15 @@ namespace Nuclear.EventStore
 
 
 
-        public List<Event> EventsForAggregate(Aggregate aggregate)
+        public List<DomainEvent> EventsForAggregate(Aggregate aggregate)
         {
-            return EventsForAggregate(new AggregateKey(aggregate.GetType(), aggregate.AggregateId));
+            return EventsForAggregate(new AggregateKey(aggregate));
         }
 
 
-        public List<Event> EventsForAggregate(AggregateKey key)
+        public List<DomainEvent> EventsForAggregate(AggregateKey key)
         {
-            List<Event> eventsForAggregate = new List<Event>();
+            List<DomainEvent> eventsForAggregate = new List<DomainEvent>();
 
             var streamName = _aggregateIdToStreamName(key.AggregateType, key.AggregateId);
 
@@ -104,7 +105,7 @@ namespace Nuclear.EventStore
 
                 foreach (var evnt in currentSlice.Events)
                 {
-                    Event aggrEvent = (Event)DeserializeEvent(evnt.OriginalEvent.Metadata, evnt.OriginalEvent.Data);
+                    DomainEvent aggrEvent = (DomainEvent)DeserializeEvent(evnt.OriginalEvent.Metadata, evnt.OriginalEvent.Data);
                     eventsForAggregate.Add(aggrEvent);
                 }
 
@@ -120,13 +121,13 @@ namespace Nuclear.EventStore
         List<Nuclear.Messaging.Event> EventsForAggregate(AggregateKey key);
          */
 
-        public void SaveEvents(Aggregate aggregate, Guid aggregateId, IEnumerable<Event> uncommittedEvents)
+        public void SaveChanges(Aggregate aggregate)
         {
-            SaveEvents(new AggregateKey(aggregate.GetType(), aggregate.AggregateId), aggregate.Revision, uncommittedEvents);
+            SaveEvents(new AggregateKey(aggregate.GetType(), aggregate.AggregateId), aggregate.Revision, aggregate.UncommittedChanges());
             aggregate.ClearUncommittedEvents();
         }
 
-        public void SaveEvents(AggregateKey key, int expectedRevision, IEnumerable<Event> uncommittedEvents)
+        public void SaveEvents(AggregateKey key, int expectedRevision, IEnumerable<DomainEvent> uncommittedEvents)
         {
             var commitHeaders = new Dictionary<string, object>
             {

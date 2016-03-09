@@ -52,13 +52,13 @@ namespace Nuclear.EventSourcing.MySql
             this._aggregateIdToStreamName = (t, g) => string.Format("{0}-{1}", char.ToLower(t.Name[0]) + t.Name.Substring(1), g);
         }
 
-        public void SaveEvents(Aggregate aggregate, Guid aggregateId, IEnumerable<Event> events)
+        public void SaveChanges(Aggregate aggregate)
         {
-            SaveEvents(new AggregateKey(aggregate.GetType(), aggregate.AggregateId), aggregate.Revision, events);
+            SaveEvents(new AggregateKey(aggregate.GetType(), aggregate.AggregateId), aggregate.Revision, aggregate.UncommittedChanges());
             aggregate.ClearUncommittedEvents();
         }
 
-        public void SaveEvents(AggregateKey key, int expectedRevision, IEnumerable<Event> events)
+        public void SaveEvents(AggregateKey key, int expectedRevision, IEnumerable<DomainEvent> events)
         {
             var commitHeaders = new Dictionary<string, object>
             {
@@ -107,15 +107,15 @@ namespace Nuclear.EventSourcing.MySql
         }
 
 
-        public List<Event> EventsForAggregate(Aggregate aggregate)
+        public List<DomainEvent> EventsForAggregate(Aggregate aggregate)
         {
-            return EventsForAggregate(new AggregateKey(aggregate.GetType(), aggregate.AggregateId));
+            return EventsForAggregate(new AggregateKey(aggregate));
         }
 
 
-        public List<Event>EventsForAggregate(AggregateKey key)
+        public List<DomainEvent> EventsForAggregate(AggregateKey key)
         {
-            List<Event> eventsForAggregate = new List<Event>();
+            List<DomainEvent> eventsForAggregate = new List<DomainEvent>();
 
             var streamName = _aggregateIdToStreamName(key.AggregateType, key.AggregateId);
 
@@ -130,7 +130,7 @@ namespace Nuclear.EventSourcing.MySql
 
                 foreach (var evnt in events)
                 {
-                    Event aggrEvent = (Event)DeserializeEvent(evnt.Metadata, evnt.Data);
+                    DomainEvent aggrEvent = (DomainEvent)DeserializeEvent(evnt.Metadata, evnt.Data);
                     eventsForAggregate.Add(aggrEvent);
                 }
             }

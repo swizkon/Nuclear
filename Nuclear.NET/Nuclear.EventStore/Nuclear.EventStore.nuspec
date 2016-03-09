@@ -9,7 +9,7 @@
     <projectUrl>https://github.com/swizkon/Nuclear</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Greg Youngs implementation of aggregate persistance and reconstitution using event store.</releaseNotes>
+    <releaseNotes>Aligned with the 3.0.0 version of Nuclear.Core and bumped  majorversion</releaseNotes>
     <copyright>Copyright 2016</copyright>
     <tags>EventSourcing EventStore</tags>
   </metadata>

@@ -9,7 +9,7 @@
     <projectUrl>https://github.com/swizkon/Nuclear</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Change the dependencies</releaseNotes>
+    <releaseNotes>Up to the 3.0.0 version of the model.</releaseNotes>
     <copyright>Copyright 2016</copyright>
     <tags>DDD MySQL CQRS EventSourcing</tags>
   </metadata>
