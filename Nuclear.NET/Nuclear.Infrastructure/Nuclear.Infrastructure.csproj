@@ -4,14 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{34D40FB8-390E-4C5E-9D97-4D0CF4750D91}</ProjectGuid>
+    <ProjectGuid>{141F1447-469A-447A-89EA-1142FFF93CD1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Nuclear</RootNamespace>
-    <AssemblyName>Nuclear.Core</AssemblyName>
+    <AssemblyName>Nuclear.Infrastructure</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,9 +20,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <DocumentationFile>bin\Debug\Nuclear.Core.xml</DocumentationFile>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -32,7 +28,6 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -44,30 +39,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Caching\ICacheAggregates.cs" />
-    <Compile Include="Domain\AggregateKey.cs" />
-    <Compile Include="Domain\AggregateRepository.cs" />
-    <Compile Include="Domain\DomainEvent.cs" />
-    <Compile Include="Domain\IAggregateEventStore.cs" />
-    <Compile Include="Domain\StreamAggregate.cs" />
-    <Compile Include="EventSourcing\EventSourcedAggregateRepository.cs" />
-    <Compile Include="EventSourcing\EventStreamStore.cs" />
-    <Compile Include="Lazy\InMemEventStore.cs" />
-    <Compile Include="Messaging\Bus.cs" />
-    <Compile Include="Messaging\CommandDelegate.cs" />
-    <Compile Include="Domain\Aggregate.cs" />
-    <Compile Include="Domain\AggregateBase.cs" />
-    <Compile Include="Messaging\Command.cs" />
-    <Compile Include="Messaging\Event.cs" />
-    <Compile Include="Messaging\Handles.cs" />
-    <Compile Include="Messaging\Message.cs" />
-    <Compile Include="Messaging\EventDispatcher.cs" />
-    <Compile Include="Extensions\PrivateReflectionDynamicObject.cs" />
-    <Compile Include="Messaging\SubscribesTo.cs" />
+    <Compile Include="Caching\RuntimeCache.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Lazy\Switchboard.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

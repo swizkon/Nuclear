@@ -31,7 +31,7 @@ namespace Nuclear.EventStore
             _publisher = publisher;
         }
 
-        public EventStoreRepository(IEventStoreConnection eventStoreConnection, Func<Type, Guid, string> aggregateIdToStreamName)
+        private EventStoreRepository(IEventStoreConnection eventStoreConnection, Func<Type, Guid, string> aggregateIdToStreamName)
         {
             _eventStoreConnection = eventStoreConnection;
             _aggregateIdToStreamName = aggregateIdToStreamName;
@@ -115,11 +115,6 @@ namespace Nuclear.EventStore
         }
 
 
-        /*
-         
-        List<Nuclear.Messaging.Event> EventsForAggregate(Aggregate aggregate);
-        List<Nuclear.Messaging.Event> EventsForAggregate(AggregateKey key);
-         */
 
         public void SaveChanges(Aggregate aggregate)
         {
@@ -171,6 +166,29 @@ namespace Nuclear.EventStore
                 _publisher.Publish(@event);
             }
         }
+
+        public void RepublishAllEvents()
+        {
+            AllEventsSlice currentSlice;
+            var nextPosition = Position.Start;
+            do
+            {
+                currentSlice = _eventStoreConnection
+                                .ReadAllEventsForwardAsync(nextPosition, ReadPageSize, false)
+                                .Result;
+
+                nextPosition = currentSlice.NextPosition;
+
+                foreach (var evnt in currentSlice.Events)
+                {
+                    DomainEvent aggrEvent = (DomainEvent)DeserializeEvent(evnt.OriginalEvent.Metadata, evnt.OriginalEvent.Data);
+                    this._publisher.Publish(aggrEvent);
+                }
+
+            } while (!currentSlice.IsEndOfStream);
+
+        }
+
     }
 
 }

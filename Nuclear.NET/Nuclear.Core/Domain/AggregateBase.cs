@@ -80,11 +80,26 @@ namespace Nuclear.Domain
         protected void AcceptChange<TEvent>(TEvent domainEvent)
             where TEvent : DomainEvent
         {
+            /*
+            AcceptChange(domainEvent,  (e) => {
+                applyChange(e);
+            });
+            */
             _changes.Add(domainEvent);
             applyChange(domainEvent);
         }
 
-        private void applyChange(DomainEvent @event)
+        /*
+        protected void AcceptChange<TEvent>(TEvent domainEvent, Action<TEvent> apply)
+            where TEvent : DomainEvent
+        {
+            _changes.Add(domainEvent);
+            apply(domainEvent);
+        }
+        */
+
+        private void applyChange<TEvent>(TEvent @event)
+            where TEvent : DomainEvent
         {
             this.bumpRevision();
             this.AsDynamic().Apply(@event);

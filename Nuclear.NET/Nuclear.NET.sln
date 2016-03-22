@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nuclear.EventStore", "Nucle
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nuclear.EventSourcing.MySql", "Nuclear.EventSourcing.MySql\Nuclear.EventSourcing.MySql.csproj", "{B9519E3C-DCA0-4FA3-8A17-05A19A601AC8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nuclear.Infrastructure", "Nuclear.Infrastructure\Nuclear.Infrastructure.csproj", "{141F1447-469A-447A-89EA-1142FFF93CD1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{B9519E3C-DCA0-4FA3-8A17-05A19A601AC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B9519E3C-DCA0-4FA3-8A17-05A19A601AC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B9519E3C-DCA0-4FA3-8A17-05A19A601AC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{141F1447-469A-447A-89EA-1142FFF93CD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{141F1447-469A-447A-89EA-1142FFF93CD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{141F1447-469A-447A-89EA-1142FFF93CD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{141F1447-469A-447A-89EA-1142FFF93CD1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

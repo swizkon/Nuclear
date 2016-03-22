@@ -39,14 +39,11 @@ namespace Nuclear.EventSourcing.MySql
 
             /* Add the mapping we defined: */
             var mapper = new ModelMapper();
-            // mapper.AddMappings(Assembly.GetExecutingAssembly().GetExportedTypes());
             mapper.AddMapping(typeof(RecordedEventMap));
             HbmMapping mapping = mapper.CompileMappingForAllExplicitlyAddedEntities();
             cfg.AddMapping(mapping);
 
-
             this.factory = cfg.BuildSessionFactory();
-
 
             this._publisher = publisher;
             this._aggregateIdToStreamName = (t, g) => string.Format("{0}-{1}", char.ToLower(t.Name[0]) + t.Name.Substring(1), g);
