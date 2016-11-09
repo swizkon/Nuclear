@@ -11,7 +11,7 @@ namespace Nuclear.Domain
         /// Stores the aggregate changes.
         /// </summary>
         /// <param name="aggregate"></param>
-        void SaveChanges(Aggregate aggregate);
+        void SaveChanges(IAggregate aggregate);
 
         /// <summary>
         /// Saves the events for an aggregate that might be unknown to the system.
@@ -26,7 +26,7 @@ namespace Nuclear.Domain
         /// </summary>
         /// <param name="aggregate"></param>
         /// <returns></returns>
-        List<DomainEvent> EventsForAggregate(Aggregate aggregate);
+        List<DomainEvent> EventsForAggregate(IAggregate aggregate);
 
         /// <summary>
         /// Returns the domain events for a possible unknown aggregate.

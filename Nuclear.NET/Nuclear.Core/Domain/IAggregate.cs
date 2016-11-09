@@ -10,7 +10,7 @@ namespace Nuclear.Domain
     /// <summary>
     /// The simple interface for a Event sourced aggregate
     /// </summary>
-    public interface Aggregate
+    public interface IAggregate
     {
         /// <summary>
         /// Takes domain events and applies them to the object graph.

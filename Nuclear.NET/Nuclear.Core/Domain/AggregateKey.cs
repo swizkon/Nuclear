@@ -12,20 +12,13 @@ namespace Nuclear.Domain
     public sealed class AggregateKey
     {
         /// <summary>
-        /// The type of the aggreagate.
-        /// </summary>
-        public Type AggregateType { get; private set; }
-
-        /// <summary>
-        /// The id of the aggreagate.
-        /// </summary>
-        public Guid AggregateId { get; private set; }
-
-        /// <summary>
+        /// Initializes a new instance of the <see cref="AggregateKey"/> class. 
         /// Open ctor.
         /// </summary>
-        /// <param name="type"></param>
-        /// <param name="id"></param>
+        /// <param name="type">
+        /// </param>
+        /// <param name="id">
+        /// </param>
         public AggregateKey(Type type, Guid id)
         {
             this.AggregateType = type;
@@ -33,10 +26,20 @@ namespace Nuclear.Domain
         }
 
         /// <summary>
+        /// The type of the aggregate.
+        /// </summary>
+        public Type AggregateType { get; private set; }
+
+        /// <summary>
+        /// The id of the aggregate.
+        /// </summary>
+        public Guid AggregateId { get; private set; }
+
+        /// <summary>
         /// Inverted factory method.
         /// </summary>
         /// <param name="obj"></param>
-        public AggregateKey(Aggregate obj)
+        public AggregateKey(IAggregate obj)
             : this(obj.GetType(), obj.AggregateId)
         {
             // this.AggregateType = obj.GetType();

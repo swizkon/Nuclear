@@ -90,7 +90,6 @@ namespace Nuclear.Lazy
                 {
                     throw new InvalidOperationException("cannot send to more than one command executor");
                 }
-                // handlers[0](command);
             }
             else if (_routes.ContainsKey(commandTypeName))
             {
@@ -117,7 +116,7 @@ namespace Nuclear.Lazy
             }
             else // Debug stuff...
             {
-                String routes = "";
+                string routes = "";
                 foreach (var key in _routes.Keys)
                 {
                     routes += " [" + key + ":";

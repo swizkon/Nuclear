@@ -8,27 +8,9 @@ namespace Nuclear.Domain
     /// <summary>
     /// The base class for a Event sourced aggregate
     /// </summary>
-    public abstract class AggregateBase : Aggregate
+    public abstract class AggregateBase : IAggregate
     {
         private readonly List<DomainEvent> _changes = new List<DomainEvent>();
-
-        /// <summary>
-        /// Internal Id for this aggregate.
-        /// </summary>
-        protected Guid Id;
-
-        /// <summary>
-        /// The Id of this aggregate.
-        /// </summary>
-        public Guid AggregateId
-        {
-            get { return this.Id; }
-        }
-
-        /// <summary>
-        /// The revision, ie number of domain events processed since constructed.
-        /// </summary>
-        public int Revision { get; internal set; }
 
         /// <summary>
         /// Base ctor to ensure the Id to always be available. 
@@ -36,8 +18,18 @@ namespace Nuclear.Domain
         /// <param name="id"></param>
         protected AggregateBase(Guid id)
         {
-            this.Id = id;
+            this.AggregateId = id;
         }
+
+        /// <summary>
+        /// Gets or sets the Id of this aggregate.
+        /// </summary>
+        public Guid AggregateId { get; protected set; }
+
+        /// <summary>
+        /// The revision, ie number of domain events processed since constructed.
+        /// </summary>
+        public int Revision { get; internal set; }
 
         /// <summary>
         /// Returns the changes to an aggregate after its last reconstitution.
@@ -66,7 +58,7 @@ namespace Nuclear.Domain
         {
             foreach (var e in history)
             {
-                applyChange(e);
+                this.ApplyChange(e);
             }
         }
 
@@ -82,23 +74,14 @@ namespace Nuclear.Domain
         {
             /*
             AcceptChange(domainEvent,  (e) => {
-                applyChange(e);
+                ApplyChange(e);
             });
             */
             _changes.Add(domainEvent);
-            applyChange(domainEvent);
+            this.ApplyChange(domainEvent);
         }
 
-        /*
-        protected void AcceptChange<TEvent>(TEvent domainEvent, Action<TEvent> apply)
-            where TEvent : DomainEvent
-        {
-            _changes.Add(domainEvent);
-            apply(domainEvent);
-        }
-        */
-
-        private void applyChange<TEvent>(TEvent @event)
+        private void ApplyChange<TEvent>(TEvent @event)
             where TEvent : DomainEvent
         {
             this.bumpRevision();

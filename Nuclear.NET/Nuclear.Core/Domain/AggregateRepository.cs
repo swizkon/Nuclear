@@ -7,7 +7,7 @@ namespace Nuclear.Domain
     /// </summary>
     /// <typeparam name="TAggregate"></typeparam>
     public interface AggregateRepository<TAggregate>
-        where TAggregate : Aggregate
+        where TAggregate : IAggregate
     {
         /// <summary>
         /// Saves the uncommitted changes to the underlying storage engine.

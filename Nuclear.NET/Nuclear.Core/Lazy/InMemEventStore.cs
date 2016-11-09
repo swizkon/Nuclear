@@ -44,7 +44,7 @@ namespace Nuclear.Lazy
         /// Stores the aggregate changes.
         /// </summary>
         /// <param name="aggregate"></param>
-        public void SaveChanges(Aggregate aggregate)
+        public void SaveChanges(IAggregate aggregate)
         {
             SaveEvents(new AggregateKey(aggregate), aggregate.Revision, aggregate.UncommittedChanges());
             aggregate.ClearUncommittedEvents();
@@ -94,7 +94,7 @@ namespace Nuclear.Lazy
         /// </summary>
         /// <param name="aggregate"></param>
         /// <returns></returns>
-        public List<DomainEvent> EventsForAggregate(Aggregate aggregate)
+        public List<DomainEvent> EventsForAggregate(IAggregate aggregate)
         {
             return EventsForAggregate(new AggregateKey(aggregate));
         }

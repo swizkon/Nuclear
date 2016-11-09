@@ -13,7 +13,7 @@ namespace Nuclear.EventSourcing
     /// <typeparam name="TAggregate">The type of aggregate to act on</typeparam>
     public class EventSourcedAggregateRepository<TAggregate>
         : AggregateRepository<TAggregate> where TAggregate
-        : class, Aggregate
+        : class, IAggregate
     {
         private readonly IAggregateEventStore _storage;
 

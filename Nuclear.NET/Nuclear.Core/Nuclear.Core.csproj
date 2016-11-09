@@ -55,7 +55,7 @@
     <Compile Include="Lazy\InMemEventStore.cs" />
     <Compile Include="Messaging\Bus.cs" />
     <Compile Include="Messaging\CommandDelegate.cs" />
-    <Compile Include="Domain\Aggregate.cs" />
+    <Compile Include="Domain\IAggregate.cs" />
     <Compile Include="Domain\AggregateBase.cs" />
     <Compile Include="Messaging\Command.cs" />
     <Compile Include="Messaging\Event.cs" />
