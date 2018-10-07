@@ -28,18 +28,19 @@ namespace EventstoreConsole
 
                 string name = null;
 
-                do{
+                do
+                {
                     System.Console.WriteLine("Enter a task: (q to exit)");
-                        name = Console.ReadLine();
-                        
-                var evt = Events.EventDataBuilder.BuildTaskAddedEvent("jdaksdkajsdaskdj");
+                    name = Console.ReadLine();
 
-                System.Console.WriteLine("Write to Eventstore...");
-                connection.AppendToStreamAsync("todos-jonas", ExpectedVersion.Any, evt).Wait();
-                System.Console.WriteLine("Written!!");
+                    var evt = Events.EventDataBuilder.BuildTaskAddedEvent(name);
+
+                    System.Console.WriteLine("Write to Eventstore...");
+                    connection.AppendToStreamAsync("todos-jonas", ExpectedVersion.Any, evt).Wait();
+                    System.Console.WriteLine("Written!!");
 
                 }
-                while(name != "q");
+                while (name != "q");
 
 
                 connection.Close();

@@ -39,7 +39,6 @@ namespace EventstoreConsole.Events
                 return new EventData(eventId, typeName, true, data, metadata);
             }
 
-
             private static byte[] AddEventClrTypeHeaderAndSerializeMetadata(object evnt, IDictionary<string, string> headers)
             {
                 var SerializerSettings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.None };
