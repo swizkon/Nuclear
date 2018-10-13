@@ -12,8 +12,6 @@ namespace EventstoreConsole
 
             Console.WriteLine("Hello World!");
 
-            // ConnectionSettings.Default.g
-
             var conn = ConnectionSettings.Default;
 
             var uri = new Uri("tcp://localhost:1113");

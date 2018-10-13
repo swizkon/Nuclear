@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Version>1.0.1</Version>
+    <PackageTags>DDD, event sourcing</PackageTags>
+    <Authors>Jonas Jerndin</Authors>
+    <Description>This library contains a base for building ES apps.</Description>
+    <Copyright>Copyright 2018 - Swizkon</Copyright>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <PackageReleaseNotes>Added generators</PackageReleaseNotes>
+    <Company>Swizkon</Company>
+    <Version>1.7.5</Version>
+    <PackageId>Nuclear.NetCore</PackageId>
+    <AssemblyVersion>1.2.0.0</AssemblyVersion>
+    <FileVersion>1.2.0.0</FileVersion>
+  </PropertyGroup>
+
+</Project>
