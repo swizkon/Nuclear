@@ -1,13 +1,15 @@
 namespace Alice.Domain
 {
     using System;
+    using System.Collections.Generic;
     using Nuclear.NetCore.Aggregates;
+    using Nuclear.NetCore.Events;
 
-    public class Bug   // : Nuclear.NetCore. // : Nuclear.NetCore.Aggregates // : Nuclear.NetCore.Aggregates.DomainAggregateBase
+    public class Bug : DomainAggregateBase
     {
-        public Bug() // : base()
+        public Bug(Guid id, IEnumerable<IDomainEvent> events) : base(id: id, events: events)
         {
-
+            
         }
     }
 }

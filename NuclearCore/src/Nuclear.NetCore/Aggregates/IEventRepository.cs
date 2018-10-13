@@ -7,8 +7,8 @@ namespace Nuclear.NetCore.Aggregates
     {
         IEnumerable<IDomainEvent> ReadEvents(IEventCategory category);
 
-        IEnumerable<IDomainEvent> ReadEvents(AggregateKey aggregateKey);
+        IEnumerable<IDomainEvent> ReadEvents(IStreamIdentifier streamIdentifier);
 
-        void WriteEvents(IEnumerable<IDomainEvent> events);
+        void WriteEvents(IStreamIdentifier streamIdentifier, IEnumerable<IDomainEvent> events);
     }
 }
