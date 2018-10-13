@@ -9,7 +9,7 @@ using Nuclear.NetCore.Extensions;
 
 namespace Nuclear.NetCore.Aggregates
 {
-    public abstract class DomainAggregateBase
+    public abstract class DomainAggregateBase : IDomainAggregate
     {
         private readonly List<IDomainEvent> _changes = new List<IDomainEvent>();
 
@@ -17,18 +17,22 @@ namespace Nuclear.NetCore.Aggregates
 
         public int Version { get; internal set; }
 
-        protected DomainAggregateBase(Guid id)
+        protected DomainAggregateBase(Guid id, IEnumerable<IDomainEvent> events)
         {
             this.AggregateId = id;
-        }
-
-        public void FromHistory(IEnumerable<IDomainEvent> history)
-        {
-            foreach (var e in history)
+            foreach (var evt in events)
             {
-                this.ApplyChange(e);
+                this.ApplyChange(evt);
             }
         }
+
+        // public void FromHistory(IEnumerable<IDomainEvent> history)
+        // {
+        //     foreach (var e in history)
+        //     {
+        //         this.ApplyChange(e);
+        //     }
+        // }
 
         public IEnumerable<IDomainEvent> UncommittedChanges()
         {
