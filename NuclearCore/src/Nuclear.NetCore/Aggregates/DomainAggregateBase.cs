@@ -9,7 +9,7 @@ using Nuclear.NetCore.Extensions;
 
 namespace Nuclear.NetCore.Aggregates
 {
-    public abstract class DomainAggregateBase : IDomainAggregate, IStreamIdentifier
+    public abstract class DomainAggregateBase : ISaveEventsAggregate, IStreamIdentifier
     {
         private readonly List<IDomainEvent> _changes = new List<IDomainEvent>();
 
@@ -17,30 +17,35 @@ namespace Nuclear.NetCore.Aggregates
 
         public int Version { get; internal set; }
 
-        protected DomainAggregateBase(Guid id, IEnumerable<IDomainEvent> events)
+        protected DomainAggregateBase(Guid id, ICollection<IDomainEvent> events)
         {
             this.AggregateId = id;
             foreach (var evt in events)
             {
+                this.Version += 1;
                 this.ApplyChange(evt);
             }
         }
 
         public string StreamIdentifier() => new AggregateKey(this).StreamIdentifier();
 
-        public IEnumerable<IDomainEvent> UncommittedChanges()
-        {
-            return _changes;
-        }
+        public string AggregateClrTypeName() => new AggregateKey(this).AggregateClrTypeName();
 
-        public void ClearUncommittedEvents()
-        {
-            _changes.Clear();
-        }
+
+        // public IEnumerable<IDomainEvent> UncommittedChanges()
+        // {
+        //     return _changes;
+        // }
+
+        // public void ClearUncommittedEvents()
+        // {
+        //     _changes.Clear();
+        // }
 
         protected void AcceptChange<TEvent>(TEvent domainEvent)
             where TEvent : IDomainEvent
         {
+            System.Console.WriteLine("AcceptChange " + @domainEvent.GetType().Name);
             _changes.Add(domainEvent);
             this.ApplyChange(domainEvent);
         }
@@ -48,13 +53,15 @@ namespace Nuclear.NetCore.Aggregates
         private void ApplyChange<TEvent>(TEvent @event)
             where TEvent : IDomainEvent
         {
-            this.bump();
+            System.Console.WriteLine("ApplyChange " + @event.GetType().Name);
             this.AsDynamic().Apply(@event);
         }
 
-        private void bump()
+        public void Save(IEventRepository repository)
         {
-            this.Version += 1;
+            repository.WriteEvents(this, Version, _changes);
+
+            _changes.Clear();
         }
     }
 }

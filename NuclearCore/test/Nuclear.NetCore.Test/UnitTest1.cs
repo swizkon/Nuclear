@@ -8,7 +8,6 @@ namespace Nuclear.NetCore.Test
         [Fact]
         public void Test1()
         {
-
         }
     }
 }

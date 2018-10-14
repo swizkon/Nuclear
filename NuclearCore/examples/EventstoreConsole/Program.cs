@@ -1,6 +1,9 @@
 ﻿using System;
-
+using Alice.Organizational.Domain;
+using Alice.Organizational.Events;
 using EventStore.ClientAPI;
+using Nuclear.NetCore.Aggregates;
+using Nuclear.NetCore.EventStore;
 
 namespace EventstoreConsole
 {
@@ -9,7 +12,9 @@ namespace EventstoreConsole
         static void Main(string[] args)
         {
             // docker run --name eventstore-node -it --rm -p 2113:2113 -p 1113:1113 eventstore/eventstore
-    
+
+
+
 
             Console.WriteLine("Hello World!");
 
@@ -23,21 +28,40 @@ namespace EventstoreConsole
                 connection.ConnectAsync().Wait();
                 System.Console.WriteLine("Connected!");
 
-                string name = null;
+                var repo = new EventStoreRepository(connection);
+
+                var organizationId = Guid.NewGuid();
+
+
+                System.Console.WriteLine("Enter organization name:");
+                var orgname = Console.ReadLine();
+
+                var orgCreatec = new OrganizationCreated { Name = orgname };
+
+                repo.WriteEvents(new AggregateKey(typeof(Organization), organizationId), new[] { orgCreatec });
+
+                string newName = null;
 
                 do
                 {
-                    System.Console.WriteLine("Enter a task: (q to exit)");
-                    name = Console.ReadLine();
+                    var history = repo.ReadEvents(new AggregateKey(typeof(Organization), organizationId));
 
-                    var evt = Events.EventDataBuilder.BuildTaskAddedEvent(name);
+                    var organization = new Organization(organizationId, history);
+                    System.Console.WriteLine("");
+                    System.Console.WriteLine("Organization " + organization.Name);
+                    System.Console.WriteLine("Rename: (q to exit)");
+                    newName = Console.ReadLine();
 
-                    System.Console.WriteLine("Write to Eventstore...");
-                    connection.AppendToStreamAsync("todos-jenny", ExpectedVersion.Any, evt).Wait();
-                    System.Console.WriteLine("Written!!");
+                    if(!string.IsNullOrWhiteSpace(newName.Replace("q","")))
+                    {
+                        // var renameEvent = new OrganizationRenamed(){NewName = newName};
+                        organization.Rename(newName);
+
+                        organization.Save(repo);
+                    }
 
                 }
-                while (name != "q");
+                while (newName != "q");
 
 
                 connection.Close();

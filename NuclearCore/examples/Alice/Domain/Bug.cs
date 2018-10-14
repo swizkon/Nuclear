@@ -7,7 +7,7 @@ namespace Alice.Domain
 
     public class Bug : DomainAggregateBase
     {
-        public Bug(Guid id, IEnumerable<IDomainEvent> events) : base(id: id, events: events)
+        public Bug(Guid id, ICollection<IDomainEvent> events) : base(id: id, events: events)
         {
             
         }

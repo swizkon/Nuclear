@@ -5,10 +5,14 @@ namespace Nuclear.NetCore.Aggregates
 {
     public interface IEventRepository
     {
-        IEnumerable<IDomainEvent> ReadEvents(IEventCategory category);
+        ICollection<IDomainEvent> ReadEvents(IEventCategory category);
 
-        IEnumerable<IDomainEvent> ReadEvents(IStreamIdentifier streamIdentifier);
+        ICollection<IDomainEvent> ReadEvents(IStreamIdentifier streamIdentifier);
 
-        void WriteEvents(IStreamIdentifier streamIdentifier, IEnumerable<IDomainEvent> events);
+        ICollection<IDomainEvent> ReadEvents(IStreamIdentifier streamIdentifier, long fromVersion);
+
+        void WriteEvents(IStreamIdentifier streamIdentifier, ICollection<IDomainEvent> events);
+
+        void WriteEvents(IStreamIdentifier streamIdentifier, long expectedVersion, ICollection<IDomainEvent> events);
     }
 }
