@@ -2,6 +2,7 @@ namespace Alice.Organizational.Domain
 {
     using System;
     using System.Collections.Generic;
+    using Alice.Organizational.Events;
     using Nuclear.NetCore.Aggregates;
     using Nuclear.NetCore.Events;
 

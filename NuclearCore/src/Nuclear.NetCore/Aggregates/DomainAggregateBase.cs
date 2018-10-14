@@ -9,7 +9,7 @@ using Nuclear.NetCore.Extensions;
 
 namespace Nuclear.NetCore.Aggregates
 {
-    public abstract class DomainAggregateBase : IDomainAggregate
+    public abstract class DomainAggregateBase : IDomainAggregate, IStreamIdentifier
     {
         private readonly List<IDomainEvent> _changes = new List<IDomainEvent>();
 
@@ -26,13 +26,7 @@ namespace Nuclear.NetCore.Aggregates
             }
         }
 
-        // public void FromHistory(IEnumerable<IDomainEvent> history)
-        // {
-        //     foreach (var e in history)
-        //     {
-        //         this.ApplyChange(e);
-        //     }
-        // }
+        public string StreamIdentifier() => new AggregateKey(this).StreamIdentifier();
 
         public IEnumerable<IDomainEvent> UncommittedChanges()
         {

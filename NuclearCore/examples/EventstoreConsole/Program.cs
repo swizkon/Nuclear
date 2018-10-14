@@ -9,11 +9,9 @@ namespace EventstoreConsole
         static void Main(string[] args)
         {
             // docker run --name eventstore-node -it --rm -p 2113:2113 -p 1113:1113 eventstore/eventstore
+    
 
-            // Alice.Organizational.Domain.Organization org = new Alice.Organizational.Domain.Organization
             Console.WriteLine("Hello World!");
-
-            // var conn = ConnectionSettings.Default;
 
             var uri = new Uri("tcp://localhost:1113");
 
@@ -35,7 +33,7 @@ namespace EventstoreConsole
                     var evt = Events.EventDataBuilder.BuildTaskAddedEvent(name);
 
                     System.Console.WriteLine("Write to Eventstore...");
-                    connection.AppendToStreamAsync("todos-jonas", ExpectedVersion.Any, evt).Wait();
+                    connection.AppendToStreamAsync("todos-jenny", ExpectedVersion.Any, evt).Wait();
                     System.Console.WriteLine("Written!!");
 
                 }
