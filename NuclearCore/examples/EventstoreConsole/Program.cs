@@ -54,9 +54,7 @@ namespace EventstoreConsole
 
                     if(!string.IsNullOrWhiteSpace(newName.Replace("q","")))
                     {
-                        // var renameEvent = new OrganizationRenamed(){NewName = newName};
                         organization.Rename(newName);
-
                         organization.Save(repo);
                     }
 

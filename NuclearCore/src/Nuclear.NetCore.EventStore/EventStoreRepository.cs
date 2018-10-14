@@ -75,7 +75,8 @@ namespace Nuclear.NetCore.EventStore
 
             var preparedEvents = PrepareEvents(newEvents, commitHeaders).ToList();
 
-            connection.AppendToStreamAsync(streamIdentifier.StreamIdentifier(), ExpectedVersion.Any, preparedEvents).Wait();
+            // connection.AppendToStreamAsync(streamIdentifier.StreamIdentifier(), ExpectedVersion.Any, preparedEvents).Wait();
+            connection.AppendToStreamAsync(streamIdentifier.StreamIdentifier(), expectedVersion, preparedEvents).Wait();
         }
 
 

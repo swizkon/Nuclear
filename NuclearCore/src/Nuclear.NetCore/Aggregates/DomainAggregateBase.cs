@@ -15,7 +15,7 @@ namespace Nuclear.NetCore.Aggregates
 
         public Guid AggregateId { get; protected set; }
 
-        public int Version { get; internal set; }
+        public int Version { get; internal set; } = -1;
 
         protected DomainAggregateBase(Guid id, ICollection<IDomainEvent> events)
         {
