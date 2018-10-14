@@ -11,6 +11,8 @@
   
   <ItemGroup>
     <ProjectReference Include="..\..\src\Nuclear.NetCore\Nuclear.NetCore.csproj" />
+    <ProjectReference Include="..\..\src\Nuclear.NetCore.EventStore\Nuclear.NetCore.EventStore.csproj" />
+    <ProjectReference Include="..\Alice\Alice.csproj" />
   </ItemGroup>
 
 </Project>

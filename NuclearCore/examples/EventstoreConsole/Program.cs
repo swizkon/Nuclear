@@ -10,9 +10,10 @@ namespace EventstoreConsole
         {
             // docker run --name eventstore-node -it --rm -p 2113:2113 -p 1113:1113 eventstore/eventstore
 
+            // Alice.Organizational.Domain.Organization org = new Alice.Organizational.Domain.Organization
             Console.WriteLine("Hello World!");
 
-            var conn = ConnectionSettings.Default;
+            // var conn = ConnectionSettings.Default;
 
             var uri = new Uri("tcp://localhost:1113");
 

@@ -72,11 +72,6 @@ namespace Nuclear.Domain
         protected void AcceptChange<TEvent>(TEvent domainEvent)
             where TEvent : DomainEvent
         {
-            /*
-            AcceptChange(domainEvent,  (e) => {
-                ApplyChange(e);
-            });
-            */
             _changes.Add(domainEvent);
             this.ApplyChange(domainEvent);
         }
