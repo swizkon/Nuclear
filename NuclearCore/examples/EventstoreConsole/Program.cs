@@ -13,9 +13,6 @@ namespace EventstoreConsole
         {
             // docker run --name eventstore-node -it --rm -p 2113:2113 -p 1113:1113 eventstore/eventstore
 
-
-
-
             Console.WriteLine("Hello World!");
 
             var uri = new Uri("tcp://localhost:1113");

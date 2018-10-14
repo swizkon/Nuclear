@@ -10,10 +10,8 @@ using Nuclear.NetCore.Events;
 
 namespace Nuclear.NetCore.EventStore
 {
-
     internal static class Serializer
     {
-
         private const string EventClrTypeHeader = "EventClrTypeName";
         private const int WritePageSize = 500;
         private const int ReadPageSize = 500;
