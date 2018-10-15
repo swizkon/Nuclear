@@ -19,7 +19,9 @@ namespace Nuclear.NetCore.Aggregates
         {
         }
         
-        public string StreamIdentifier() => $"{AggregateType.FullName.Replace('.', '-')}-{AggregateId}";
+        public string StreamIdentifier() => $"{AggregateName}-{AggregateId}";
+
+        private string AggregateName => AggregateType.FullName.Replace('.', '_');
 
         public string AggregateClrTypeName() => AggregateType.AssemblyQualifiedName;
     }

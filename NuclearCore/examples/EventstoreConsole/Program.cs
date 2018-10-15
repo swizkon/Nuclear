@@ -13,7 +13,7 @@ namespace EventstoreConsole
         {
             // docker run --name eventstore-node -it --rm -p 2113:2113 -p 1113:1113 eventstore/eventstore
 
-            Console.WriteLine("Hello World!");
+            Console.WriteLine("Hello EventstoreConsole!");
 
             var uri = new Uri("tcp://localhost:1113");
 
@@ -27,6 +27,21 @@ namespace EventstoreConsole
 
                 var repo = new EventStoreRepository(connection);
 
+                // WriteByEventType(repo);
+                
+                OrganizationTest(repo);
+                
+                connection.Close();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private static void OrganizationTest(EventStoreRepository repo)
+        {
+            
                 var organizationId = Guid.NewGuid();
 
 
@@ -57,14 +72,23 @@ namespace EventstoreConsole
 
                 }
                 while (newName != "q");
+        }
 
+        private static void WriteByEventType(EventStoreRepository repo)
+        {
 
-                connection.Close();
-
-            }
-            catch (Exception ex)
+            System.Console.WriteLine("OrganizationCreated");
+            var createdEvents = repo.ReadEventsByType<OrganizationCreated>();
+            foreach(var evt in createdEvents)
             {
-                Console.WriteLine(ex.Message);
+                System.Console.WriteLine(evt.Name);
+            }
+            
+            System.Console.WriteLine("OrganizationRenamed");
+            var renamedEvents = repo.ReadEventsByType<OrganizationRenamed>();
+            foreach(var evt in renamedEvents)
+            {
+                System.Console.WriteLine(evt.NewName);
             }
         }
     }

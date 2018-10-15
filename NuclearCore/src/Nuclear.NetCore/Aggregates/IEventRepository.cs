@@ -5,7 +5,7 @@ namespace Nuclear.NetCore.Aggregates
 {
     public interface IEventRepository
     {
-        ICollection<IDomainEvent> ReadEvents(IEventCategory category);
+        ICollection<TDomainEvent> ReadEventsByType<TDomainEvent>() where TDomainEvent : IDomainEvent;
 
         ICollection<IDomainEvent> ReadEvents(IStreamIdentifier streamIdentifier);
 

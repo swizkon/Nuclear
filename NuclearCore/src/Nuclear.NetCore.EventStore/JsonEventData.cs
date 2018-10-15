@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Text;
 using EventStore.ClientAPI;
 using Newtonsoft.Json;
+using Nuclear.NetCore.Extensions;
 
 namespace Nuclear.NetCore.EventStore
 {
-    static class JsonEventData
+    internal static class JsonEventData
     {
-        private const string EventClrTypeHeader = "EventClrTypeName";
-
         private static readonly JsonSerializerSettings SerializerSettings;
 
         static JsonEventData()
@@ -21,8 +20,7 @@ namespace Nuclear.NetCore.EventStore
         {
             var data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(evnt, SerializerSettings));
             var metadata = AddEventClrTypeHeaderAndSerializeMetadata(evnt, headers);
-            var typeName = evnt.GetType().Name;
-
+            var typeName = EventExtensions.UnifiedEventName(evnt.GetType());
             return new EventData(eventId, typeName, true, data, metadata);
         }
 
@@ -30,7 +28,7 @@ namespace Nuclear.NetCore.EventStore
         {
             var eventHeaders = new Dictionary<string, object>(headers)
                 {
-                    {EventClrTypeHeader, evnt.GetType().AssemblyQualifiedName}
+                    {Settings.EventClrTypeHeader, evnt.GetType().AssemblyQualifiedName}
                 };
 
             return Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(eventHeaders, SerializerSettings));

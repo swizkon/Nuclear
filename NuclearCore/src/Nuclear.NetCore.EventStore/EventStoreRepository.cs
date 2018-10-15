@@ -1,36 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using EventStore.ClientAPI;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Nuclear.NetCore.Aggregates;
 using Nuclear.NetCore.Events;
+using Nuclear.NetCore.Extensions;
 
 namespace Nuclear.NetCore.EventStore
 {
-    internal static class Serializer
-    {
-        private const string EventClrTypeHeader = "EventClrTypeName";
-        private const int WritePageSize = 500;
-        private const int ReadPageSize = 500;
-
-        public static object DeserializeEvent(byte[] metadata, byte[] data)
-        {
-            var eventClrTypeName = JObject.Parse(Encoding.UTF8.GetString(metadata)).Property(EventClrTypeHeader).Value;
-            return JsonConvert.DeserializeObject(Encoding.UTF8.GetString(data), Type.GetType((string)eventClrTypeName));
-        }
-    }
 
     public class EventStoreRepository : IEventRepository
     {
-        private const string AggregateClrTypeHeader = "AggregateClrTypeName";
-        private const string CommitIdHeader = "CommitId";
-        
-        private const int WritePageSize = 500;
-        private const int ReadPageSize = 500;
-
         private readonly IEventStoreConnection connection;
 
         public EventStoreRepository(IEventStoreConnection connection)
@@ -38,9 +18,30 @@ namespace Nuclear.NetCore.EventStore
             this.connection = connection;
         }
 
-        public ICollection<IDomainEvent> ReadEvents(IEventCategory category)
+        public ICollection<TDomainEvent> ReadEventsByType<TDomainEvent>() where TDomainEvent : IDomainEvent
         {
-            throw new NotImplementedException();
+            // var t = 
+            var streamName = "$et-" + EventExtensions.UnifiedEventName(typeof(TDomainEvent));
+            var eventsForAggregate = new List<TDomainEvent>();
+
+            StreamEventsSlice currentSlice;
+            var nextSliceStart = 0L;
+            do
+            {
+                currentSlice = connection
+                                .ReadStreamEventsForwardAsync(streamName, nextSliceStart, Settings.ReadPageSize, true)
+                                .Result;
+                nextSliceStart = currentSlice.NextEventNumber;
+
+                foreach (var evnt in currentSlice.Events)
+                {
+                    var aggrEvent = (TDomainEvent)Serializer.DeserializeEvent(evnt.Event.Metadata, evnt.Event.Data);
+                    eventsForAggregate.Add(aggrEvent);
+                }
+
+            } while (!currentSlice.IsEndOfStream);
+
+            return eventsForAggregate;
         }
 
         public ICollection<IDomainEvent> ReadEvents(IStreamIdentifier streamIdentifier)
@@ -62,30 +63,21 @@ namespace Nuclear.NetCore.EventStore
         {
             var commitHeaders = new Dictionary<string, object>
             {
-                {CommitIdHeader, Guid.NewGuid()},
-                {AggregateClrTypeHeader, streamIdentifier.AggregateClrTypeName()}
+                {Settings.CommitIdHeader, Guid.NewGuid()},
+                {Settings.AggregateClrTypeHeader, streamIdentifier.AggregateClrTypeName()}
             };
 
             var newEvents = events.Cast<object>().ToList();
-            // var expectedVersion = expectedRevision <= 0 ? ExpectedVersion.NoStream : expectedRevision - 1;
-
-            // expectedVersion = ExpectedVersion.Any;
-
+            
             var preparedEvents = PrepareEvents(newEvents, commitHeaders).ToList();
 
-            // connection.AppendToStreamAsync(streamIdentifier.StreamIdentifier(), ExpectedVersion.Any, preparedEvents).Wait();
             connection.AppendToStreamAsync(streamIdentifier.StreamIdentifier(), expectedVersion, preparedEvents).Wait();
         }
-
-
-
+        
         private static IEnumerable<EventData> PrepareEvents(IEnumerable<object> events, IDictionary<string, object> commitHeaders)
         {
             return events.Select(e => JsonEventData.Create(Guid.NewGuid(), e, commitHeaders));
         }
-
-
-
 
         private ICollection<IDomainEvent> ReadEventsInternal(IStreamIdentifier stream)
         {
@@ -96,7 +88,7 @@ namespace Nuclear.NetCore.EventStore
             do
             {
                 currentSlice = connection
-                                .ReadStreamEventsForwardAsync(stream.StreamIdentifier(), nextSliceStart, ReadPageSize, false)
+                                .ReadStreamEventsForwardAsync(stream.StreamIdentifier(), nextSliceStart, Settings.ReadPageSize, false)
                                 .Result;
                 nextSliceStart = currentSlice.NextEventNumber;
 
@@ -110,7 +102,5 @@ namespace Nuclear.NetCore.EventStore
 
             return eventsForAggregate;
         }
-
-
     }
 }

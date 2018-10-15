@@ -7,7 +7,6 @@ namespace Nuclear.NetCore.Extensions
     using System.Linq;
     using System.Reflection;
 
-
     public static class PrivateReflectionDynamicObjectExtensions
     {
         /// <summary>
