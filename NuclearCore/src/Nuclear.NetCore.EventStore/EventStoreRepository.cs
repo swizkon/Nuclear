@@ -8,7 +8,6 @@ using Nuclear.NetCore.Extensions;
 
 namespace Nuclear.NetCore.EventStore
 {
-
     public class EventStoreRepository : IEventRepository
     {
         private readonly IEventStoreConnection connection;
@@ -20,7 +19,6 @@ namespace Nuclear.NetCore.EventStore
 
         public ICollection<TDomainEvent> ReadEventsByType<TDomainEvent>() where TDomainEvent : IDomainEvent
         {
-            // var t = 
             var streamName = "$et-" + EventExtensions.UnifiedEventName(typeof(TDomainEvent));
             var eventsForAggregate = new List<TDomainEvent>();
 
