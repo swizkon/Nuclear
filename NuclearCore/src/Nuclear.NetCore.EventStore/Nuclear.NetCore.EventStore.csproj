@@ -12,8 +12,8 @@
     <Company>Swizkon</Company>
     <Version>1.10.0</Version>
     <PackageId>Nuclear.NetCore.EventStore</PackageId>
-    <AssemblyVersion>1.9.0.0</AssemblyVersion>
-    <FileVersion>1.9.0.0</FileVersion>
+    <AssemblyVersion>1.10.0.0</AssemblyVersion>
+    <FileVersion>1.10.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
