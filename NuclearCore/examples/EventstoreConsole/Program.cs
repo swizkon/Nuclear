@@ -29,7 +29,7 @@ namespace EventstoreConsole
 
                 // OrganizationTest(repo);
                 WriteByEventType(repo);
-                
+
                 connection.Close();
             }
             catch (Exception ex)
@@ -40,55 +40,52 @@ namespace EventstoreConsole
 
         private static void OrganizationTest(EventStoreRepository repo)
         {
-            
-                var organizationId = Guid.NewGuid();
+            var organizationId = Guid.NewGuid();
 
+            System.Console.WriteLine("Enter organization name:");
+            var orgname = Console.ReadLine();
 
-                System.Console.WriteLine("Enter organization name:");
-                var orgname = Console.ReadLine();
+            var orgCreatec = new OrganizationCreated { Name = orgname };
 
-                var orgCreatec = new OrganizationCreated { Name = orgname };
+            repo.WriteEvents(new AggregateKey(typeof(Organization), organizationId), new[] { orgCreatec });
 
-                repo.WriteEvents(new AggregateKey(typeof(Organization), organizationId), new[] { orgCreatec });
+            string newName = null;
 
-                string newName = null;
+            do
+            {
+                var history = repo.ReadEvents(new AggregateKey(typeof(Organization), organizationId));
 
-                do
+                var organization = new Organization(organizationId, history);
+                System.Console.WriteLine("");
+                System.Console.WriteLine("Organization " + organization.Name);
+                System.Console.WriteLine("Rename: (q to exit)");
+                newName = Console.ReadLine();
+
+                if (!string.IsNullOrWhiteSpace(newName.Replace("q", "")))
                 {
-                    var history = repo.ReadEvents(new AggregateKey(typeof(Organization), organizationId));
-
-                    var organization = new Organization(organizationId, history);
-                    System.Console.WriteLine("");
-                    System.Console.WriteLine("Organization " + organization.Name);
-                    System.Console.WriteLine("Rename: (q to exit)");
-                    newName = Console.ReadLine();
-
-                    if(!string.IsNullOrWhiteSpace(newName.Replace("q","")))
-                    {
-                        organization.Rename(newName);
-                        organization.Save(repo);
-                    }
-
+                    organization.Rename(newName);
+                    organization.Save(repo);
                 }
-                while (newName != "q");
+
+            }
+            while (newName != "q");
         }
 
         private static void WriteByEventType(EventStoreRepository repo)
         {
-
             System.Console.WriteLine("OrganizationCreated");
             var createdEvents = repo.ReadEventsByType<OrganizationCreated>();
-            foreach(var evt in createdEvents)
+            foreach (var evt in createdEvents)
             {
                 System.Console.WriteLine(evt.AggregateKey);
                 System.Console.WriteLine(evt.Event.Name);
             }
-            
+
             System.Console.WriteLine("OrganizationRenamed");
             var renamedEvents = repo.ReadEventsByType<OrganizationRenamed>();
-            foreach(var evt in renamedEvents)
+            foreach (var evt in renamedEvents)
             {
-                System.Console.WriteLine(evt.AggregateKey.StreamIdentifier());
+                System.Console.WriteLine(evt.AggregateKey.AggregateType);
                 System.Console.WriteLine(evt.Event.NewName);
             }
         }
