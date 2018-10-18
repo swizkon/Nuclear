@@ -31,6 +31,8 @@ namespace Nuclear.NetCore.Aggregates
 
         public string AggregateClrTypeName() => new AggregateKey(this).AggregateClrTypeName();
 
+        public string AggregateIdentifier() => new AggregateKey(this).AggregateIdentifier();
+
 
         // public IEnumerable<IDomainEvent> UncommittedChanges()
         // {

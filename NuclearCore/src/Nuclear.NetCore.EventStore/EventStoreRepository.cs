@@ -17,10 +17,10 @@ namespace Nuclear.NetCore.EventStore
             this.connection = connection;
         }
 
-        public ICollection<TDomainEvent> ReadEventsByType<TDomainEvent>() where TDomainEvent : IDomainEvent
+        public ICollection<AggregateEvent<TDomainEvent>> ReadEventsByType<TDomainEvent>() where TDomainEvent : IDomainEvent
         {
             var streamName = "$et-" + EventExtensions.UnifiedEventName(typeof(TDomainEvent));
-            var eventsForAggregate = new List<TDomainEvent>();
+            var eventsForAggregate = new List<AggregateEvent<TDomainEvent>>();
 
             StreamEventsSlice currentSlice;
             var nextSliceStart = 0L;
@@ -33,7 +33,22 @@ namespace Nuclear.NetCore.EventStore
 
                 foreach (var evnt in currentSlice.Events)
                 {
-                    var aggrEvent = (TDomainEvent)Serializer.DeserializeEvent(evnt.Event.Metadata, evnt.Event.Data);
+                    var metaData = Serializer.DeserializeMetadata(evnt.Event.Metadata);
+
+                    var e = (TDomainEvent)Serializer.DeserializeEvent(evnt.Event.Metadata, evnt.Event.Data);
+                    
+                    var k = evnt.Event.EventStreamId;
+                    System.Console.WriteLine(k);
+
+                    var aggregateStreamType = metaData[Settings.AggregateClrTypeHeader]?.ToString();
+
+                    var aggregateStreamId = metaData[Settings.AggregateIdHeader]?.ToString() ?? Guid.NewGuid().ToString(); // k.Substring(k.IndexOf('-') + 1);
+                    
+                    System.Console.WriteLine(aggregateStreamId);
+
+                    var aggregateKey = new AggregateKey(Type.GetType(aggregateStreamType), Guid.Parse(aggregateStreamId) );
+
+                    var aggrEvent = new AggregateEvent<TDomainEvent>(aggregateKey, e);
                     eventsForAggregate.Add(aggrEvent);
                 }
 
@@ -62,7 +77,8 @@ namespace Nuclear.NetCore.EventStore
             var commitHeaders = new Dictionary<string, object>
             {
                 {Settings.CommitIdHeader, Guid.NewGuid()},
-                {Settings.AggregateClrTypeHeader, streamIdentifier.AggregateClrTypeName()}
+                {Settings.AggregateClrTypeHeader, streamIdentifier.AggregateClrTypeName()},
+                {Settings.AggregateIdHeader, streamIdentifier.AggregateIdentifier()}
             };
 
             var newEvents = events.Cast<object>().ToList();

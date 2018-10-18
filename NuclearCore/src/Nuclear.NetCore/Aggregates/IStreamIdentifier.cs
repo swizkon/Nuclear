@@ -4,6 +4,8 @@ namespace Nuclear.NetCore.Aggregates
     {
         string AggregateClrTypeName();
 
+        string AggregateIdentifier();
+
         string StreamIdentifier();
     }
 }

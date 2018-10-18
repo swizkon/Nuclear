@@ -4,6 +4,8 @@ namespace Nuclear.NetCore.EventStore
     {
         public const string AggregateClrTypeHeader = "AggregateClrTypeName";
 
+        public const string AggregateIdHeader = "AggregateId";
+
         public const string EventClrTypeHeader = "EventClrTypeName";
 
         public const string CommitIdHeader = "CommitId";

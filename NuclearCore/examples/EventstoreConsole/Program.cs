@@ -27,9 +27,8 @@ namespace EventstoreConsole
 
                 var repo = new EventStoreRepository(connection);
 
-                // WriteByEventType(repo);
-                
-                OrganizationTest(repo);
+                // OrganizationTest(repo);
+                WriteByEventType(repo);
                 
                 connection.Close();
             }
@@ -81,14 +80,16 @@ namespace EventstoreConsole
             var createdEvents = repo.ReadEventsByType<OrganizationCreated>();
             foreach(var evt in createdEvents)
             {
-                System.Console.WriteLine(evt.Name);
+                System.Console.WriteLine(evt.AggregateKey);
+                System.Console.WriteLine(evt.Event.Name);
             }
             
             System.Console.WriteLine("OrganizationRenamed");
             var renamedEvents = repo.ReadEventsByType<OrganizationRenamed>();
             foreach(var evt in renamedEvents)
             {
-                System.Console.WriteLine(evt.NewName);
+                System.Console.WriteLine(evt.AggregateKey.StreamIdentifier());
+                System.Console.WriteLine(evt.Event.NewName);
             }
         }
     }

@@ -24,5 +24,7 @@ namespace Nuclear.NetCore.Aggregates
         private string AggregateName => AggregateType.FullName.Replace('.', '_');
 
         public string AggregateClrTypeName() => AggregateType.AssemblyQualifiedName;
+
+        public string AggregateIdentifier() => AggregateId.ToString();
     }
 }
