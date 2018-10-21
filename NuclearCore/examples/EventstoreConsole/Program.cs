@@ -11,7 +11,7 @@ namespace EventstoreConsole
     {
         static void Main(string[] args)
         {
-            // docker run --name eventstore-node -it --rm -p 2113:2113 -p 1113:1113 eventstore/eventstore
+            // docker run --name eventstore-node -it --rm -p 2113:2113 -p 1113:1113 -v ~/data/eventstore/ESData:/var/lib/eventstore -v ~/data/eventstore/logs:/var/log/eventstore eventstore/eventstore --run-projections=all
 
             Console.WriteLine("Hello EventstoreConsole!");
 
