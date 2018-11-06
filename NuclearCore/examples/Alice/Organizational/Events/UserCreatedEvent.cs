@@ -13,7 +13,7 @@ namespace Alice.Organizational.Events
 
         public string ShortName { get; set; }
 
-        public string email { get; set; }
+        public string Email { get; set; }
 
         public Role Role { get; set; }
     }

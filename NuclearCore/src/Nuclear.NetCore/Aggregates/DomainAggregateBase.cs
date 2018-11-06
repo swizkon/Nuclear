@@ -33,17 +33,6 @@ namespace Nuclear.NetCore.Aggregates
 
         public string AggregateIdentifier() => new AggregateKey(this).AggregateIdentifier();
 
-
-        // public IEnumerable<IDomainEvent> UncommittedChanges()
-        // {
-        //     return _changes;
-        // }
-
-        // public void ClearUncommittedEvents()
-        // {
-        //     _changes.Clear();
-        // }
-
         protected void AcceptChange<TEvent>(TEvent domainEvent)
             where TEvent : IDomainEvent
         {
